@@ -7,6 +7,12 @@
     "changelog": "Changelog",
     "settings": "Settings"
   },
+  "language": {
+    "label": "Language",
+    "english": "English",
+    "chinese": "中文",
+    "selectLanguage": "Select Language"
+  },
   "common": {
     "loading": "Loading...",
     "cancel": "Cancel",

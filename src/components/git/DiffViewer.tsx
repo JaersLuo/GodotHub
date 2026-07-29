@@ -12,7 +12,7 @@ interface Props {
 }
 
 export function DiffViewer({ projectPath, filePath, onClose }: Props) {
-  const { t } = useTranslation('diffViewer')
+  const { t } = useTranslation()
   const [diff, setDiff] = useState<GitDiffResult | null>(null)
   const [loading, setLoading] = useState(true)
 

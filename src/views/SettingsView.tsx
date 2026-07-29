@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useRef, useState } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { useTranslation } from 'react-i18next'
+import i18n from '../i18n'
 import { useSettings } from '../hooks/useSettings'
 import { DirList } from '../components/ui/DirList'
 import { Toggle } from '../components/ui/Toggle'
@@ -1300,6 +1301,24 @@ export function SettingsView({
                       </motion.button>
                     </div>
                   </div>
+                </div>
+
+                <div className="flex items-center gap-3">
+                  <span className="text-xs font-medium text-muted shrink-0">
+                    {t('language.label')}
+                  </span>
+                  <select
+                    value={i18n.language || 'en'}
+                    onChange={(e) => {
+                      const lang = e.target.value
+                      i18n.changeLanguage(lang)
+                      localStorage.setItem('godothub_language', lang)
+                    }}
+                    className="flex-1 max-w-xs bg-raised border border-line rounded-lg px-3 py-2 text-sm focus:border-accent-dim transition-colors cursor-pointer"
+                  >
+                    <option value="en">{t('language.english')}</option>
+                    <option value="zh">{t('language.chinese')}</option>
+                  </select>
                 </div>
 
                 <div className="flex gap-8">

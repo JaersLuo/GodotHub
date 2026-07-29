@@ -54,7 +54,7 @@ export function GitResultDialog({
   onClose,
   onOpenTerminal,
 }: GitResultDialogProps) {
-  const { t } = useTranslation('gitResultDialog')
+  const { t } = useTranslation()
   const [showRaw, setShowRaw] = useState(false)
 
   return (

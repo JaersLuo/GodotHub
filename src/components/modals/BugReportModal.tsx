@@ -119,7 +119,7 @@ function downloadReport(report: string) {
 }
 
 export function BugReportModal({ onClose }: Props) {
-  const { t } = useTranslation('bugReport')
+  const { t } = useTranslation()
   const [report, setReport] = useState<string | null>(null)
   const [loading, setLoading] = useState(true)
 

@@ -14,7 +14,7 @@ function ErrorBoundaryUI({
 }: {
   error: Error
 }) {
-  const { t } = useTranslation('errorBoundary')
+  const { t } = useTranslation()
 
   return (
     <div

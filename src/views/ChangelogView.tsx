@@ -45,7 +45,7 @@ function EntryCard({
   onEdit: () => void
   onDelete: () => void
 }) {
-  const { t } = useTranslation('changelog')
+  const { t } = useTranslation()
   return (
     <motion.div
       layout
@@ -129,7 +129,7 @@ function EntryCard({
 export function ChangelogView() {
   const { entries, loading, addEntry, updateEntry, removeEntry } =
     useChangelog()
-  const { t } = useTranslation('changelog')
+  const { t } = useTranslation()
   const [modalOpen, setModalOpen] = useState(false)
   const [editingEntry, setEditingEntry] = useState<ChangelogEntry | null>(null)
   const [confirmingDeleteId, setConfirmingDeleteId] = useState<string | null>(

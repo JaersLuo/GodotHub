@@ -7,6 +7,12 @@
     "changelog": "更新日志",
     "settings": "设置"
   },
+  "language": {
+    "label": "语言",
+    "english": "English",
+    "chinese": "中文",
+    "selectLanguage": "选择语言"
+  },
   "common": {
     "loading": "加载中...",
     "cancel": "取消",

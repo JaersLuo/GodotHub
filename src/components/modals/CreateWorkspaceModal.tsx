@@ -1,4 +1,4 @@
-import { useState } from 'react'
+﻿import { useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { motion } from 'framer-motion'
 import { ColorSwatchPicker } from '../ui/ColorSwatchPicker'
@@ -23,7 +23,7 @@ export function CreateWorkspaceModal({ onClose, onCreate }: Props) {
 
   const submit = async () => {
     if (!name.trim()) {
-      setError(t('createWorkspace:validationError'))
+      setError(t('.'))
       return
     }
     setBusy(true)
@@ -53,26 +53,26 @@ export function CreateWorkspaceModal({ onClose, onCreate }: Props) {
         onClick={(e) => e.stopPropagation()}
       >
         <div>
-          <h3 className="font-display font-semibold text-lg">{t('createWorkspace:title')}</h3>
+          <h3 className="font-display font-semibold text-lg">{t('.')}</h3>
           <p className="text-xs text-muted mt-1.5">
-            {t('createWorkspace:description')}
+            {t('.')}
           </p>
         </div>
 
         <div className="flex flex-col gap-2">
-          <label className="text-xs font-medium text-muted">{t('createWorkspace:name')}</label>
+          <label className="text-xs font-medium text-muted">{t('.')}</label>
           <input
             autoFocus
             value={name}
             onChange={(e) => setName(e.target.value)}
             onKeyDown={(e) => e.key === 'Enter' && submit()}
             className="focus-ring bg-raised border border-line rounded-lg px-3.5 py-2.5 text-sm focus:border-accent-dim transition-colors"
-            placeholder={t('createWorkspace:namePlaceholder')}
+            placeholder={t('.')}
           />
         </div>
 
         <div className="flex flex-col gap-2.5">
-          <span className="text-xs font-medium text-muted">{t('createWorkspace:icon')}</span>
+          <span className="text-xs font-medium text-muted">{t('.')}</span>
           <div className="flex flex-wrap gap-2">
             {WORKSPACE_ICON_KEYS.map((key) => {
               const Icon = getWorkspaceIcon(key)
@@ -99,7 +99,7 @@ export function CreateWorkspaceModal({ onClose, onCreate }: Props) {
         </div>
 
         <ColorSwatchPicker
-          label={t('createWorkspace:color')}
+          label={t('.')}
           value={color}
           onChange={setColor}
           presets={WORKSPACE_COLOR_PRESETS}
@@ -114,7 +114,7 @@ export function CreateWorkspaceModal({ onClose, onCreate }: Props) {
             onClick={onClose}
             className="focus-ring cursor-pointer px-4 py-2.5 rounded-lg text-sm text-muted hover:text-ink hover:bg-raised transition-colors"
           >
-            {t('common:cancel')}
+            {t('.')}
           </motion.button>
           <motion.button
             whileHover={busy ? undefined : { y: -1 }}
@@ -123,7 +123,7 @@ export function CreateWorkspaceModal({ onClose, onCreate }: Props) {
             disabled={busy}
             className="focus-ring px-4 cursor-pointer py-2.5 rounded-lg bg-accent hover:bg-accent-bright disabled:opacity-50 text-sm font-medium text-white transition-colors"
           >
-            {busy ? t('createWorkspace:creating') : t('createWorkspace:createWorkspace')}
+            {busy ? t('.') : t('.')}
           </motion.button>
         </div>
       </motion.div>

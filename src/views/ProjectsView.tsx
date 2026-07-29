@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState, useRef, useCallback } from 'react'
+﻿import { useEffect, useMemo, useState, useRef, useCallback } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import {
   DndContext,
@@ -133,12 +133,12 @@ function ZoneDropArea({ zoneKey }: { zoneKey: string }) {
           <span className={`text-xs transition-all duration-150 ${
             isOver ? 'text-accent font-semibold' : 'text-muted/40'
           }`}>
-            {isOver ? t('projects:zoneDropHere') : t('projects:zoneNoProjects')}
+            {isOver ? t('.') : t('.')}
           </span>
           <span className={`text-[10px] transition-all duration-150 ${
             isOver ? 'text-accent/70' : 'text-muted/30'
           }`}>
-            {isOver ? t('projects:zoneReleaseToMove') : t('projects:zoneDragToAdd')}
+            {isOver ? t('.') : t('.')}
           </span>
         </div>
       </div>
@@ -411,7 +411,7 @@ export function ProjectsView({
     keys.push(UNCATEGORIZED)
     return keys.map((key) => ({
       key,
-      label: key === UNCATEGORIZED ? t('projects:uncategorized') : key,
+      label: key === UNCATEGORIZED ? t('.') : key,
       items: groups.get(key)!,
     }))
   }, [filteredProjects, availableCategories, showCategories, sortProjects])
@@ -628,11 +628,11 @@ export function ProjectsView({
           await api.openTerminal(project.path)
         } else if (action === 'pull') {
           const result = await api.gitPull(project.path)
-          alert(result || t('projects:pullCompleted'))
+          alert(result || t('.'))
           setTimeout(fetchGitStatuses, 2000)
         } else if (action === 'push') {
           const result = await api.gitPush(project.path)
-          alert(result || t('projects:pushCompleted'))
+          alert(result || t('.'))
           setTimeout(fetchGitStatuses, 2000)
         } else if (action === 'fetch') {
           await api.gitFetch(project.path)
@@ -797,12 +797,12 @@ export function ProjectsView({
       <div className="flex items-center justify-between mb-6">
         <div>
           <h2 className="font-body font-semibold text-3xl tracking-tight">
-            {t('projects:title')}
+            {t('.')}
           </h2>
           <p className="text-xs text-muted">
-            {t('projects:projectCount', { count: projects.length })}
+            {t('.', { count: projects.length })}
             {isSearching && (
-              <> · {t('projects:showingCount', { count: filteredProjects.length })}</>
+              <> · {t('.', { count: filteredProjects.length })}</>
             )}
           </p>
         </div>
@@ -817,7 +817,7 @@ export function ProjectsView({
             <span className="icon-wiggle inline-flex">
               <IconFolderPlus className="w-4 h-4" />
             </span>
-            {t('projects:newProject')}
+            {t('.')}
           </motion.button>
 
           {/* Import split button, main action + clone dropdown */}
@@ -833,14 +833,14 @@ export function ProjectsView({
                 <span className="icon-wiggle inline-flex">
                   <IconImport className="w-4 h-4" />
                 </span>
-                {t('projects:import')}
+                {t('.')}
               </motion.button>
               <motion.button
                 whileHover={{ y: -1 }}
                 whileTap={{ scale: 0.96 }}
                 onClick={() => setImportDropdownOpen((prev) => !prev)}
                 className="focus-ring cursor-pointer px-2 py-2.5 text-muted hover:text-ink transition-colors"
-                aria-label={t('projects:moreImportOptions')}
+                aria-label={t('.')}
               >
                 <IconChevronDown className={`w-3 h-3 transition-transform duration-200 ${importDropdownOpen ? 'rotate-180 text-accent' : ''}`} />
               </motion.button>
@@ -860,7 +860,7 @@ export function ProjectsView({
                     className="w-full flex items-center cursor-pointer gap-2.5 px-5 py-2 rounded-lg text-xs font-medium text-ink hover:bg-raised transition-colors"
                   >
                     <IconGitBranch className="w-4 h-4 text-muted" />
-                    {t('projects:cloneAndImport')}
+                    {t('.')}
                   </button>
                 </motion.div>
               )}
@@ -868,7 +868,7 @@ export function ProjectsView({
           </div>
 
           {/* Scan Now, icon only with tooltip */}
-          <Tooltip content={scanning ? t('projects:scanning') : t('projects:scanForProjects')} side="bottom">
+          <Tooltip content={scanning ? t('.') : t('.')} side="bottom">
             <motion.button
               whileHover={{ y: -1 }}
               whileTap={{ scale: 0.96 }}
@@ -882,13 +882,13 @@ export function ProjectsView({
 
           {/* Categories, icon only with tooltip */}
           {categoriesEnabled && (
-            <Tooltip content={t('projects:manageCategories')} side="bottom">
+            <Tooltip content={t('.')} side="bottom">
               <motion.button
                 whileHover={{ y: -1 }}
                 whileTap={{ scale: 0.96 }}
                 onClick={() => setCategoryModalOpen(true)}
                 className="focus-ring cursor-pointer p-2.5 rounded-lg border border-line hover:border-accent-dim hover:bg-raised text-muted hover:text-ink transition-colors"
-                aria-label={t('projects:manageCategories')}
+                aria-label={t('.')}
               >
                 <IconTags className="w-4 h-4" />
               </motion.button>
@@ -908,14 +908,14 @@ export function ProjectsView({
               type="text"
               value={query}
               onChange={(e) => setQuery(e.target.value)}
-              placeholder={t('projects:searchPlaceholder')}
+              placeholder={t('.')}
               className="focus-ring w-full bg-surface border border-line rounded-lg pl-9 pr-9 py-2.5 text-sm text-ink placeholder:text-muted transition-colors focus:border-accent-dim"
             />
             {isSearching && (
               <button
                 type="button"
                 onClick={() => setQuery('')}
-                aria-label={t('projects:clearSearch')}
+                aria-label={t('.')}
                 className="focus-ring cursor-pointer absolute right-2.5 top-1/2 -translate-y-1/2 p-1 rounded-md text-muted hover:text-ink hover:bg-raised transition-colors"
               >
                 <IconX className="w-3.5 h-3.5" />
@@ -929,7 +929,7 @@ export function ProjectsView({
               className="w-44"
               value={sortBy}
               onChange={(v) => setSortBy((v || 'categories') as ProjectSortOption)}
-              emptyLabel={t('projects:sortPlaceholder')}
+              emptyLabel={t('.')}
               options={SORT_OPTIONS.filter(
                 (opt) => categoriesEnabled || opt.value !== 'categories',
               )}
@@ -944,7 +944,7 @@ export function ProjectsView({
             <IconRefresh className="w-5 h-5 text-muted animate-spin" />
           </div>
           <p className="text-sm text-muted max-w-xs leading-relaxed">
-            {t('projects:loadingProjects')}
+            {t('.')}
           </p>
         </div>
       ) : !hasAnyProjects ? (
@@ -953,7 +953,7 @@ export function ProjectsView({
             <IconNode className="w-5 h-5 text-muted" />
           </div>
           <p className="text-sm text-muted max-w-xs leading-relaxed">
-            {t('projects:emptyState')}
+            {t('.')}
           </p>
         </div>
       ) : !hasVisibleProjects ? (
@@ -962,7 +962,7 @@ export function ProjectsView({
             <IconSearch fill="none" className="w-5 h-5 text-muted" />
           </div>
           <p className="text-sm text-muted max-w-xs leading-relaxed">
-            {t('projects:noMatch', { query: query.trim() })}
+            {t('.', { query: query.trim() })}
           </p>
         </div>
       ) : (
@@ -1002,11 +1002,11 @@ export function ProjectsView({
                       fill="currentColor"
                     />
                     <h3 className="text-xs font-semibold uppercase tracking-wide text-muted">
-                      {t('projects:pinned')}
+                      {t('.')}
                     </h3>
                     {activeId && isOverPinned && (
                       <span className="ml-1 text-[10px] font-medium text-accent animate-pulse">
-                        {t('projects:dropHere')}
+                        {t('.')}
                       </span>
                     )}
                   </div>
@@ -1062,7 +1062,7 @@ export function ProjectsView({
                 const collapsed = collapsedCats[key]
                 const isOver = overContainer === key
                 const catColor =
-                  label === t('projects:uncategorized')
+                  label === t('.')
                     ? undefined
                     : categories.find((c) => c.name === label)?.color
                 const isEmpty = ids.length === 0
@@ -1078,7 +1078,7 @@ export function ProjectsView({
                         }
                         onPointerDown={(e) => e.stopPropagation()}
                         className="focus-ring cursor-pointer inline-flex items-center justify-center w-5 h-5 rounded hover:ring-1 hover:bg-raised transition-all"
-                        aria-label={collapsed ? t('projects:expandCategory', { label }) : t('projects:collapseCategory', { label })}
+                        aria-label={collapsed ? t('.', { label }) : t('.', { label })}
                         style={
                           catColor
                             ? ({ '--tw-ring-color': catColor } as React.CSSProperties)
@@ -1096,7 +1096,7 @@ export function ProjectsView({
                       </span>
                       {activeId && isOver && (
                         <span className="ml-1 text-[10px] font-medium text-accent animate-pulse normal-case">
-                          {t('projects:dropHere')}
+                          {t('.')}
                         </span>
                       )}
                     </div>
@@ -1178,7 +1178,7 @@ export function ProjectsView({
             className="fixed bottom-6 left-1/2 -translate-x-1/2 z-50 flex items-center gap-2 px-4 py-2.5 rounded-2xl bg-surface border border-line shadow-2xl shadow-black/40"
           >
             <span className="text-xs font-medium text-muted whitespace-nowrap mr-1">
-              {t('projects:selectedCount', { count: selectedCount })}
+              {t('.', { count: selectedCount })}
             </span>
 
             <motion.button
@@ -1192,19 +1192,19 @@ export function ProjectsView({
                 }
               }}
               className="focus-ring cursor-pointer px-2.5 py-1.5 rounded-lg text-xs font-semibold text-muted hover:text-ink hover:bg-raised transition-colors"
-              aria-label={selectedIds.size === allVisibleIdsRef.current.length && allVisibleIdsRef.current.length > 0 ? t('projects:deselectAll') : t('projects:selectAll')}
+              aria-label={selectedIds.size === allVisibleIdsRef.current.length && allVisibleIdsRef.current.length > 0 ? t('.') : t('.')}
             >
-              {selectedIds.size === allVisibleIdsRef.current.length && allVisibleIdsRef.current.length > 0 ? t('projects:deselectAll') : t('projects:selectAll')}
+              {selectedIds.size === allVisibleIdsRef.current.length && allVisibleIdsRef.current.length > 0 ? t('.') : t('.')}
             </motion.button>
 
             <div className="h-5 w-px bg-line/60" />
 
-            <Tooltip content={selectedIds.size === 1 ? t('projects:togglePin') : t('projects:pinUnpinAll')} side="top">
+            <Tooltip content={selectedIds.size === 1 ? t('.') : t('.')} side="top">
               <motion.button
                 whileTap={{ scale: 0.92 }}
                 onClick={handleBatchPin}
                 className="focus-ring cursor-pointer p-1.5 rounded-lg text-muted hover:text-ink hover:bg-raised transition-colors"
-                aria-label={t('projects:togglePin')}
+                aria-label={t('.')}
               >
                 <IconPin className="w-3.5 h-3.5" fill="none" />
               </motion.button>
@@ -1214,7 +1214,7 @@ export function ProjectsView({
               className="w-44"
               value=""
               onChange={(tag) => tag && handleBatchVersionChange(tag)}
-              emptyLabel={t('projects:setVersion')}
+              emptyLabel={t('.')}
               openUp
               options={installed.map((v) => ({
                 value: v.tag,
@@ -1233,11 +1233,11 @@ export function ProjectsView({
                   handleBatchCategoryChange(resolved)
                 }
               }}
-              emptyLabel={t('projects:setCategory')}
+              emptyLabel={t('.')}
               openUp
               options={availableCategories.map((c) => ({
                 value: c,
-                label: c === UNCATEGORIZED ? t('projects:uncategorized') : c,
+                label: c === UNCATEGORIZED ? t('.') : c,
               }))}
             />
 
@@ -1247,19 +1247,19 @@ export function ProjectsView({
               whileTap={{ scale: 0.95 }}
               onClick={handleBatchRemove}
               className="focus-ring cursor-pointer px-2.5 py-1.5 rounded-lg text-xs font-semibold text-muted hover:text-danger hover:bg-danger/10 transition-colors"
-              aria-label={t('projects:removeSelected')}
+              aria-label={t('.')}
             >
-              {t('projects:remove')}
+              {t('.')}
             </motion.button>
 
             <div className="h-5 w-px bg-line/60" />
 
-            <Tooltip content={t('projects:clearSelection')} side="top">
+            <Tooltip content={t('.')} side="top">
               <motion.button
                 whileTap={{ scale: 0.92 }}
                 onClick={handleClearSelection}
                 className="focus-ring cursor-pointer p-1.5 rounded-lg text-muted hover:text-ink hover:bg-raised transition-colors ml-1"
-                aria-label={t('projects:clearSelection')}
+                aria-label={t('.')}
               >
                 <IconX className="w-3.5 h-3.5" />
               </motion.button>
@@ -1271,9 +1271,9 @@ export function ProjectsView({
       <AnimatePresence>
         {confirmBatchRemove && (
           <ConfirmDialog
-            title={t('projects:confirmRemoveTitle', { count: selectedCount })}
-            description={t('projects:confirmRemoveDescription', { count: selectedCount })}
-            confirmLabel={t('projects:confirmRemoveLabel', { count: selectedCount })}
+            title={t('.', { count: selectedCount })}
+            description={t('.', { count: selectedCount })}
+            confirmLabel={t('.', { count: selectedCount })}
             variant="danger"
             onConfirm={executeBatchRemove}
             onCancel={() => setConfirmBatchRemove(false)}
@@ -1284,9 +1284,9 @@ export function ProjectsView({
       <AnimatePresence>
         {confirmBatchPin && (
           <ConfirmDialog
-            title={t('projects:confirmPinTitle', { count: selectedCount, isSingle: selectedCount === 1 })}
-            description={t('projects:confirmPinDescription', { action: [...selectedIds].every((id) => projectsById.get(id)?.pinned) ? t('projects:actionUnpin') : t('projects:actionPin') })}
-            confirmLabel={t('common:confirm')}
+            title={t('.', { count: selectedCount, isSingle: selectedCount === 1 })}
+            description={t('.', { action: [...selectedIds].every((id) => projectsById.get(id)?.pinned) ? t('.') : t('.') })}
+            confirmLabel={t('.')}
             variant="default"
             onConfirm={executeBatchPin}
             onCancel={() => setConfirmBatchPin(false)}
@@ -1297,9 +1297,9 @@ export function ProjectsView({
       <AnimatePresence>
         {confirmBatchVersion && (
           <ConfirmDialog
-            title={t('projects:confirmVersionTitle', { count: selectedCount })}
-            description={t('projects:confirmVersionDescription', { version: confirmBatchVersion })}
-            confirmLabel={t('projects:confirmVersionLabel', { version: confirmBatchVersion })}
+            title={t('.', { count: selectedCount })}
+            description={t('.', { version: confirmBatchVersion })}
+            confirmLabel={t('.', { version: confirmBatchVersion })}
             variant="default"
             onConfirm={executeBatchVersionChange}
             onCancel={() => setConfirmBatchVersion(null)}
@@ -1310,9 +1310,9 @@ export function ProjectsView({
       <AnimatePresence>
         {confirmBatchCategory != null && (
           <ConfirmDialog
-            title={t('projects:confirmCategoryTitle', { count: selectedCount })}
-            description={t('projects:confirmCategoryDescription', { category: confirmBatchCategory === '' ? t('projects:uncategorized') : confirmBatchCategory })}
-            confirmLabel={t('projects:confirmCategoryLabel', { category: confirmBatchCategory === '' ? t('projects:uncategorized') : confirmBatchCategory })}
+            title={t('.', { count: selectedCount })}
+            description={t('.', { category: confirmBatchCategory === '' ? t('.') : confirmBatchCategory })}
+            confirmLabel={t('.', { category: confirmBatchCategory === '' ? t('.') : confirmBatchCategory })}
             variant="default"
             onConfirm={executeBatchCategoryChange}
             onCancel={() => setConfirmBatchCategory(null)}
@@ -1335,10 +1335,10 @@ export function ProjectsView({
             </div>
             <div className="flex-1 min-w-0">
               <p className="text-xs font-semibold text-ink uppercase tracking-wide">
-                {t('projects:removedFromLibrary')}
+                {t('.')}
               </p>
               <p className="text-sm text-muted mt-0.5 truncate">
-                {t('projects:projectsRemoved', { count: undoBatchData.paths.length })}
+                {t('.', { count: undoBatchData.paths.length })}
               </p>
             </div>
             <motion.button
@@ -1347,13 +1347,13 @@ export function ProjectsView({
               onClick={handleUndoBatchRemove}
               className="focus-ring cursor-pointer shrink-0 px-3 py-1.5 rounded-lg bg-accent/10 border border-accent/20 text-accent-bright text-xs font-semibold hover:bg-accent/20 transition-colors"
             >
-              {t('common:undo')}
+              {t('.')}
             </motion.button>
-            <Tooltip content={t('common:dismiss')} side="bottom">
+            <Tooltip content={t('.')} side="bottom">
               <button
                 onClick={() => setUndoBatchData(null)}
                 className="focus-ring cursor-pointer shrink-0 p-1.5 rounded-lg text-muted hover:text-ink hover:bg-raised transition-colors"
-                aria-label={t('common:dismiss')}
+                aria-label={t('.')}
               >
                 <IconX className="w-3.5 h-3.5" />
               </button>
@@ -1413,10 +1413,10 @@ export function ProjectsView({
             <IconRefresh className="w-6 h-6 animate-spin text-accent" />
             <p className="text-sm font-medium text-ink">
               {importing
-                ? t('projects:importingProject')
+                ? t('.')
                 : scanProgress && scanProgress.total > 0
-                  ? t('projects:importingProjectCount', { current: scanProgress.current, total: scanProgress.total })
-                  : t('projects:scanningForProjects')}
+                  ? t('.', { current: scanProgress.current, total: scanProgress.total })
+                  : t('.')}
             </p>
             {scanProgress && scanProgress.total > 0 && (
               <div className="h-1.5 w-full rounded-full bg-line overflow-hidden">
@@ -1432,7 +1432,7 @@ export function ProjectsView({
               onClick={() => setDialogMinimized(true)}
               className="focus-ring cursor-pointer text-xs text-muted hover:text-ink transition-colors mt-1"
             >
-              {t('common:resumeBackground')}
+              {t('.')}
             </button>
           </div>
         </div>

@@ -34,7 +34,7 @@ export function MergeConflictDialog({
   onOpenTerminal,
   onAbortMerge,
 }: MergeConflictDialogProps) {
-  const { t } = useTranslation('mergeConflictDialog')
+  const { t } = useTranslation()
   const [conflictFiles, setConflictFiles] = useState<ConflictFile[]>([])
   const [loading, setLoading] = useState(true)
   const [resolving, setResolving] = useState<string | null>(null)
