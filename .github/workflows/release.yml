@@ -63,14 +63,16 @@ jobs:
             libsoup-3.0-dev \
             libjavascriptcoregtk-4.1-dev
 
-      - name: Setup Bun
-        uses: oven-sh/setup-bun@v2
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
 
       - name: Install frontend dependencies
-        run: bun install
+        run: npm install
 
       - name: TypeScript typecheck
-        run: bun run tsc --noEmit
+        run: npx tsc --noEmit
 
       - name: Build Tauri app & publish release
         uses: tauri-apps/tauri-action@v1

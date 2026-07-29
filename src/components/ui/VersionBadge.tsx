@@ -1,3 +1,5 @@
+import { useTranslation } from 'react-i18next'
+
 interface Props {
   tag: string
   state?: 'installed' | 'available' | 'downloading' | 'unbound'
@@ -12,6 +14,7 @@ const dotColor = {
 } as const
 
 export function VersionBadge({ tag, state = 'available', customName }: Props) {
+  const { t } = useTranslation()
   return (
     <span className="inline-flex items-center gap-2 px-3 py-1.5 rounded-lg bg-raised border border-line font-mono text-xs text-ink">
       <span
@@ -20,10 +23,10 @@ export function VersionBadge({ tag, state = 'available', customName }: Props) {
       {customName ? (
         <>
           {customName}
-          <span className="text-muted">({tag || 'unbound'})</span>
+          <span className="text-muted">({tag || t('versionBadge.unbound')})</span>
         </>
       ) : (
-        tag || 'unbound'
+        tag || t('versionBadge.unbound')
       )}
     </span>
   )

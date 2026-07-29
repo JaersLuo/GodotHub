@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react'
 import { motion } from 'framer-motion'
 import { openUrl } from '@tauri-apps/plugin-opener'
+import { useTranslation } from 'react-i18next'
 import { version } from '../../../package.json'
 import { IconBug, IconCopy, IconDownload, IconExternalLink, IconRefresh } from '../Icons'
 
@@ -56,52 +57,52 @@ function installErrorCapture() {
 // from app startup, not just when the modal opens.
 installErrorCapture()
 
-async function getGPUInfo(): Promise<string> {
+async function getGPUInfo(t: (key: string) => string): Promise<string> {
   try {
     const canvas = document.createElement('canvas')
     const gl = canvas.getContext('webgl') || canvas.getContext('experimental-webgl')
-    if (!gl) return 'WebGL not available'
+    if (!gl) return t('report.webglNotAvailable')
     const debugInfo = (gl as WebGLRenderingContext).getExtension('WEBGL_debug_renderer_info')
-    if (!debugInfo) return 'GPU info unavailable'
+    if (!debugInfo) return t('report.gpuInfoUnavailable')
     const renderer = (gl as WebGLRenderingContext).getParameter(debugInfo.UNMASKED_RENDERER_WEBGL)
     const vendor = (gl as WebGLRenderingContext).getParameter(debugInfo.UNMASKED_VENDOR_WEBGL)
     canvas.remove()
     return `${vendor}, ${renderer}`
   } catch {
-    return 'GPU info unavailable'
+    return t('report.gpuInfoUnavailable')
   }
 }
 
-async function buildReport(): Promise<string> {
-  const gpu = await getGPUInfo()
+async function buildReport(t: (key: string) => string): Promise<string> {
+  const gpu = await getGPUInfo(t)
 
   const lines: string[] = [
-    '=== GodotHub Bug Report ===',
+    t('report.title'),
     '',
-    `Version: ${version}`,
-    `Date: ${new Date().toISOString().slice(0, 10)}`,
+    `${t('report.version')}: ${version}`,
+    `${t('report.date')}: ${new Date().toISOString().slice(0, 10)}`,
     '',
-    '--- System ---',
-    `OS: ${navigator.userAgent.includes('Windows') ? 'Windows' : navigator.userAgent.includes('Mac OS X') || navigator.userAgent.includes('macOS') ? 'macOS' : navigator.userAgent.includes('Linux') ? 'Linux' : navigator.userAgent}`,
-    `Platform: ${navigator.platform}`,
-    `Language: ${navigator.language}`,
-    `CPU Cores: ${navigator.hardwareConcurrency ?? 'unknown'}`,
-    `RAM: ${(navigator as Navigator & { deviceMemory?: number }).deviceMemory ? `${(navigator as Navigator & { deviceMemory?: number }).deviceMemory} GB` : 'unknown'}`,
-    `Screen: ${screen.width}x${screen.height} @${screen.colorDepth}bit`,
-    `GPU: ${gpu}`,
-    `User Agent: ${navigator.userAgent}`,
+    t('report.system'),
+    `${t('report.os')}: ${navigator.userAgent.includes('Windows') ? 'Windows' : navigator.userAgent.includes('Mac OS X') || navigator.userAgent.includes('macOS') ? 'macOS' : navigator.userAgent.includes('Linux') ? 'Linux' : navigator.userAgent}`,
+    `${t('report.platform')}: ${navigator.platform}`,
+    `${t('report.language')}: ${navigator.language}`,
+    `${t('report.cpuCores')}: ${navigator.hardwareConcurrency ?? t('report.unknown')}`,
+    `${t('report.ram')}: ${(navigator as Navigator & { deviceMemory?: number }).deviceMemory ? `${(navigator as Navigator & { deviceMemory?: number }).deviceMemory} GB` : t('report.unknown')}`,
+    `${t('report.screen')}: ${screen.width}x${screen.height} @${screen.colorDepth}bit`,
+    `${t('report.gpu')}: ${gpu}`,
+    `${t('report.userAgent')}: ${navigator.userAgent}`,
   ]
 
   if (capturedErrors.length > 0) {
-    lines.push('', '--- Recent Errors ---')
+    lines.push('', t('report.recentErrors'))
     for (const err of capturedErrors) {
       lines.push(`  [${err.time}] (${err.source}) ${err.message}`)
     }
   } else {
-    lines.push('', '--- Recent Errors ---', '  (none captured)')
+    lines.push('', t('report.recentErrors'), t('report.noErrorsCaptured'))
   }
 
-  lines.push('', '--- End ---')
+  lines.push('', t('report.end'))
   return lines.join('\n')
 }
 
@@ -118,13 +119,14 @@ function downloadReport(report: string) {
 }
 
 export function BugReportModal({ onClose }: Props) {
+  const { t } = useTranslation('bugReport')
   const [report, setReport] = useState<string | null>(null)
   const [loading, setLoading] = useState(true)
 
   useEffect(() => {
     let cancelled = false
     setLoading(true)
-    buildReport().then((r) => {
+    buildReport(t).then((r) => {
       if (!cancelled) {
         setReport(r)
         setLoading(false)
@@ -135,7 +137,7 @@ export function BugReportModal({ onClose }: Props) {
       // Don't uninstall the capture — we want errors to persist
       // across modal sessions so users can always see them.
     }
-  }, [])
+  }, [t])
 
   const handleCopy = async () => {
     if (!report) return
@@ -167,9 +169,9 @@ export function BugReportModal({ onClose }: Props) {
             <IconBug className="w-5 h-5 text-danger" />
           </div>
           <div>
-            <h3 className="font-display font-semibold text-lg">Report a Bug</h3>
+            <h3 className="font-display font-semibold text-lg">{t('title')}</h3>
             <p className="text-xs text-muted mt-0.5">
-              Help me improve GodotHub v{version}
+              {t('description', { version })}
             </p>
           </div>
         </div>
@@ -196,7 +198,7 @@ export function BugReportModal({ onClose }: Props) {
             className="focus-ring cursor-pointer flex items-center gap-2 px-4 py-2.5 rounded-lg border border-line text-sm text-muted hover:text-ink hover:border-accent-dim hover:bg-raised transition-colors disabled:opacity-40 disabled:cursor-not-allowed"
           >
             <IconCopy className="w-4 h-4" />
-            Copy Log
+            {t('copyLog')}
           </button>
           <div className="flex items-center gap-2.5">
             <motion.button
@@ -207,7 +209,7 @@ export function BugReportModal({ onClose }: Props) {
               className="focus-ring cursor-pointer flex items-center gap-2 px-4 py-2.5 rounded-lg border border-line text-sm text-muted hover:text-ink hover:border-accent-dim hover:bg-raised transition-colors disabled:opacity-40 disabled:cursor-not-allowed"
             >
               <IconDownload className="w-4 h-4" />
-              Download Log
+              {t('downloadLog')}
             </motion.button>
             <motion.button
               whileHover={{ y: -1 }}
@@ -219,7 +221,7 @@ export function BugReportModal({ onClose }: Props) {
               className="focus-ring cursor-pointer flex items-center gap-2 px-4 py-2.5 rounded-lg bg-danger hover:bg-danger/90 text-sm font-medium text-white transition-colors"
             >
               <IconExternalLink className="w-4 h-4" />
-              Open GitHub Issues
+              {t('openGithubIssues')}
             </motion.button>
           </div>
         </div>

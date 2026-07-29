@@ -1,6 +1,7 @@
 import { motion, AnimatePresence } from 'framer-motion'
 import { api } from '../../lib/api'
 import { IconPlus, IconTrash, IconCheck } from '../Icons'
+import { useTranslation } from 'react-i18next'
 
 interface Props {
   dirs: string[]
@@ -19,10 +20,13 @@ export function DirList({
   emptyHint,
   defaultDir,
   onSetDefault,
-  defaultLabel = 'Default',
+  defaultLabel,
   fallbackDownloadPath = 'AppData\\Roaming\\com.ryko.godothub\\godot-versions\\',
   showFallbackDescription = false,
 }: Props) {
+  const { t } = useTranslation()
+  const resolvedDefaultLabel = defaultLabel ?? t('dirList.default')
+
   const addDir = async () => {
     const folder = await api.pickFolder()
     if (folder && !dirs.includes(folder)) onChange([...dirs, folder])
@@ -62,7 +66,7 @@ export function DirList({
                 <button
                   onClick={() => removeDir(dir)}
                   className="icon-wiggle cursor-pointer text-muted hover:text-danger transition-colors shrink-0"
-                  aria-label="Remove folder"
+                  aria-label={t('dirList.removeFolder')}
                 >
                   <IconTrash className="w-3.5 h-3.5" />
                 </button>
@@ -93,15 +97,15 @@ export function DirList({
                         (isDefault ? 'text-ink' : 'text-muted')
                       }
                     >
-                      Use as {defaultLabel.toLowerCase()}
+                      {t('dirList.useAsDefault', { label: resolvedDefaultLabel.toLowerCase() })}
                     </span>
                   </label>
 
                   {!isDefault && showFallbackDescription && (
                     <p className="text-[10px] text-muted mt-1.5 leading-relaxed">
                       {hasDefault
-                        ? `Downloads will go to "${defaultDir}"`
-                        : `Default Downloads will go to "${fallbackDownloadPath}"`}
+                        ? t('dirList.downloadsToDefault', { path: defaultDir })
+                        : t('dirList.downloadsToFallback', { path: fallbackDownloadPath })}
                     </p>
                   )}
                 </div>
@@ -117,7 +121,7 @@ export function DirList({
         className="icon-wiggle cursor-pointer focus-ring flex items-center gap-1.5 self-start px-3.5 py-2 rounded-lg border border-dashed border-line text-xs text-muted hover:text-accent-bright hover:border-accent-dim transition-colors"
       >
         <IconPlus className="w-3 h-3" />
-        Add folder
+        {t('dirList.addFolder')}
       </motion.button>
     </div>
   )

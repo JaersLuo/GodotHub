@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState, useCallback } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
+import { useTranslation } from 'react-i18next'
 import type { Project, ProjectSizeInfo } from '../../types'
 import { api } from '../../lib/api'
 import { IconX, IconHardDrive } from '../Icons'
@@ -35,18 +36,19 @@ function DonutChart({
   hoveredIndex: number | null
   onHover: (index: number | null) => void
 }) {
+  const { t } = useTranslation()
   const innerRadius = 65
   const [animated, setAnimated] = useState(false)
 
   useEffect(() => {
-    const t = setTimeout(() => setAnimated(true), 50)
-    return () => clearTimeout(t)
+    const timer = setTimeout(() => setAnimated(true), 50)
+    return () => clearTimeout(timer)
   }, [])
 
   if (totalSize === 0) {
     return (
       <div className="flex items-center justify-center h-56 text-muted text-sm">
-        No files found
+        {t('projectProperties.noFilesFound')}
       </div>
     )
   }
@@ -69,13 +71,13 @@ function DonutChart({
       : 0
     displayArcs.push({
       ...remaining.reduce((merged, c) => ({
-        label: 'Other',
+        label: t('projectProperties.other'),
         size: merged.size + c.size,
         color: '#94a3b8',
         count: merged.count + c.count,
         startAngle: 0,
         endAngle: 0,
-      }), { label: 'Other', size: 0, color: '#94a3b8', count: 0, startAngle: 0, endAngle: 0 }),
+      }), { label: t('projectProperties.other'), size: 0, color: '#94a3b8', count: 0, startAngle: 0, endAngle: 0 }),
       startAngle,
       endAngle: 360,
     })
@@ -135,7 +137,7 @@ function DonutChart({
         textAnchor="middle"
         className="fill-muted text-[10px] uppercase tracking-wider"
       >
-        Total
+        {t('projectProperties.total')}
       </text>
     </svg>
   )
@@ -211,6 +213,7 @@ function ChartTooltip({
 }
 
 export function ProjectPropertiesModal({ project, onClose }: Props) {
+  const { t } = useTranslation()
   const [sizeInfo, setSizeInfo] = useState<ProjectSizeInfo | null>(null)
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
@@ -264,7 +267,7 @@ export function ProjectPropertiesModal({ project, onClose }: Props) {
               <IconHardDrive className="w-5 h-5 text-accent-bright" />
             </div>
             <div>
-              <h3 className="font-display font-semibold text-lg">Project Size</h3>
+              <h3 className="font-display font-semibold text-lg">{t('projectProperties.projectSize')}</h3>
               <p className="text-xs text-muted font-mono truncate max-w-sm">
                 {project.name}
               </p>
@@ -284,7 +287,7 @@ export function ProjectPropertiesModal({ project, onClose }: Props) {
         {loading ? (
           <div className="flex flex-col items-center justify-center py-16 gap-3">
             <div className="w-8 h-8 rounded-full border-2 border-accent/30 border-t-accent animate-spin" />
-            <p className="text-sm text-muted">Scanning project files…</p>
+            <p className="text-sm text-muted">{t('projectProperties.scanningFiles')}</p>
           </div>
         ) : error ? (
           <div className="flex items-center justify-center py-16 text-danger text-sm">
@@ -296,7 +299,7 @@ export function ProjectPropertiesModal({ project, onClose }: Props) {
               <ChartTooltip
                 content={
                   hoveredCat
-                    ? `${hoveredCat.label}: ${formatSize(hoveredCat.size)} (${hoveredCat.count} files)`
+                    ? `${hoveredCat.label}: ${formatSize(hoveredCat.size)} (${hoveredCat.count} ${t('projectProperties.files')})`
                     : null
                 }
               >
@@ -312,12 +315,12 @@ export function ProjectPropertiesModal({ project, onClose }: Props) {
             <div className="flex-1 min-w-0">
               <div className="flex items-center gap-6 mb-5 pb-4 border-b border-line">
                 <div>
-                  <p className="text-[10px] font-semibold uppercase tracking-wider text-muted/60">Total Size</p>
+                  <p className="text-[10px] font-semibold uppercase tracking-wider text-muted/60">{t('projectProperties.totalSize')}</p>
                   <p className="text-lg font-display font-semibold text-ink mt-0.5">{formatSize(sizeInfo.total_size)}</p>
                 </div>
                 <div className="w-px h-8 bg-line" />
                 <div>
-                  <p className="text-[10px] font-semibold uppercase tracking-wider text-muted/60">Files</p>
+                  <p className="text-[10px] font-semibold uppercase tracking-wider text-muted/60">{t('projectProperties.files')}</p>
                   <p className="text-lg font-display font-semibold text-ink mt-0.5">{sizeInfo.file_count.toLocaleString()}</p>
                 </div>
               </div>

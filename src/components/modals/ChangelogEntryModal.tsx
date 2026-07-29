@@ -1,17 +1,8 @@
 import { useState } from 'react'
 import { motion } from 'framer-motion'
+import { useTranslation } from 'react-i18next'
 import { IconPlus, IconX } from '../Icons'
 import type { ChangelogEntry, ChangelogNote } from '../../types'
-
-const CATEGORIES: {
-  value: ChangelogNote['category']
-  label: string
-  color: string
-}[] = [
-  { value: 'add', label: 'Add', color: 'text-mint' },
-  { value: 'fix', label: 'Fix', color: 'text-danger' },
-  { value: 'improve', label: 'Improve', color: 'text-accent-bright' },
-]
 
 interface Props {
   entry?: ChangelogEntry
@@ -26,6 +17,7 @@ interface Props {
 const todayIso = () => new Date().toISOString().slice(0, 10)
 
 export function ChangelogEntryModal({ entry, onClose, onSave }: Props) {
+  const { t } = useTranslation()
   const [version, setVersion] = useState(entry?.version ?? '')
   const [date, setDate] = useState(entry?.date ?? todayIso())
   const [notes, setNotes] = useState<ChangelogNote[]>(
@@ -33,6 +25,12 @@ export function ChangelogEntryModal({ entry, onClose, onSave }: Props) {
   )
   const [error, setError] = useState<string | null>(null)
   const [busy, setBusy] = useState(false)
+
+  const CATEGORIES = [
+    { value: 'add' as const, label: t('changelogEntry.categoryAdd'), color: 'text-mint' },
+    { value: 'fix' as const, label: t('changelogEntry.categoryFix'), color: 'text-danger' },
+    { value: 'improve' as const, label: t('changelogEntry.categoryImprove'), color: 'text-accent-bright' },
+  ]
 
   const setNote = (i: number, patch: Partial<ChangelogNote>) =>
     setNotes((prev) =>
@@ -47,7 +45,7 @@ export function ChangelogEntryModal({ entry, onClose, onSave }: Props) {
 
   const submit = async () => {
     if (!version.trim()) {
-      setError('Give the entry a version.')
+      setError(t('changelogEntry.validationError'))
       return
     }
     setBusy(true)
@@ -80,16 +78,16 @@ export function ChangelogEntryModal({ entry, onClose, onSave }: Props) {
         <div className="flex flex-col gap-6 p-7 pb-0 shrink-0">
           <div>
             <h3 className="font-display font-semibold text-lg">
-              {entry ? 'Edit Changelog Entry' : 'New Changelog Entry'}
+              {entry ? t('changelogEntry.editTitle') : t('changelogEntry.newTitle')}
             </h3>
             <p className="text-xs text-muted mt-1.5">
-              Logs an app update, shown newest-first on the Changelog page.
+              {t('changelogEntry.description')}
             </p>
           </div>
 
           <div className="flex gap-4">
             <div className="flex flex-col gap-2 flex-1">
-              <label className="text-xs font-medium text-muted">Version</label>
+              <label className="text-xs font-medium text-muted">{t('changelogEntry.version')}</label>
               <input
                 autoFocus
                 value={version}
@@ -99,7 +97,7 @@ export function ChangelogEntryModal({ entry, onClose, onSave }: Props) {
               />
             </div>
             <div className="flex flex-col gap-2 flex-1">
-              <label className="text-xs font-medium text-muted">Date</label>
+              <label className="text-xs font-medium text-muted">{t('changelogEntry.date')}</label>
               <input
                 value={date}
                 onChange={(e) => setDate(e.target.value)}
@@ -111,7 +109,7 @@ export function ChangelogEntryModal({ entry, onClose, onSave }: Props) {
         </div>
 
         <div className="flex flex-col gap-2.5 p-7 overflow-y-auto min-h-0">
-          <span className="text-xs font-medium text-muted">What changed</span>
+          <span className="text-xs font-medium text-muted">{t('changelogEntry.whatChanged')}</span>
           <div className="flex flex-col gap-2">
             {notes.map((note, i) => (
               <div key={i} className="flex items-center gap-2">
@@ -141,13 +139,13 @@ export function ChangelogEntryModal({ entry, onClose, onSave }: Props) {
                     }
                   }}
                   className="focus-ring flex-1 bg-raised border border-line rounded-lg px-3.5 py-2 text-sm focus:border-accent-dim transition-colors"
-                  placeholder="Added drag-and-drop project reordering"
+                  placeholder={t('changelogEntry.notePlaceholder')}
                 />
                 {notes.length > 1 && (
                   <button
                     type="button"
                     onClick={() => removeNote(i)}
-                    aria-label="Remove line"
+                    aria-label={t('changelogEntry.removeLine')}
                     className="focus-ring cursor-pointer p-1.5 rounded-md text-muted hover:text-danger hover:bg-danger/10 transition-colors"
                   >
                     <IconX className="w-3 h-3" />
@@ -164,7 +162,7 @@ export function ChangelogEntryModal({ entry, onClose, onSave }: Props) {
             className="focus-ring cursor-pointer self-start flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs text-muted hover:text-ink hover:bg-raised transition-colors"
           >
             <IconPlus className="w-3 h-3" />
-            Add line
+            {t('changelogEntry.addLine')}
           </motion.button>
         </div>
 
@@ -177,7 +175,7 @@ export function ChangelogEntryModal({ entry, onClose, onSave }: Props) {
               onClick={onClose}
               className="focus-ring cursor-pointer px-4 py-2.5 rounded-lg text-sm text-muted hover:text-ink hover:bg-raised transition-colors"
             >
-              Cancel
+              {t('common.cancel')}
             </motion.button>
             <motion.button
               whileHover={busy ? undefined : { y: -1 }}
@@ -186,7 +184,7 @@ export function ChangelogEntryModal({ entry, onClose, onSave }: Props) {
               disabled={busy}
               className="focus-ring px-4 cursor-pointer py-2.5 rounded-lg bg-accent hover:bg-accent-bright disabled:opacity-50 text-sm font-medium text-white transition-colors"
             >
-              {busy ? 'Saving…' : entry ? 'Save Changes' : 'Add Entry'}
+              {busy ? t('common.saving') : entry ? t('common.saveChanges') : t('common.addEntry')}
             </motion.button>
           </div>
         </div>

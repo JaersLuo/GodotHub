@@ -9,6 +9,7 @@ import {
   type ReactNode,
 } from 'react'
 import { listen } from '@tauri-apps/api/event'
+import i18n from '../i18n'
 import type { DownloadProgress } from '../types'
 
 export interface Task {
@@ -104,7 +105,7 @@ export function TaskTrayProvider({ children }: { children: ReactNode }) {
           registerTask({
             id: 'scan-projects',
             type: 'scan-projects',
-            label: 'Scanning projects',
+            label: i18n.t('taskTray.scanningProjects'),
             description: total > 0 ? `${current} / ${total}` : undefined,
             progress: { current, total },
             status: 'running',
@@ -125,7 +126,7 @@ export function TaskTrayProvider({ children }: { children: ReactNode }) {
           registerTask({
             id: 'scan-versions',
             type: 'scan-versions',
-            label: 'Scanning versions',
+            label: i18n.t('taskTray.scanningVersions'),
             description: total > 0 ? `${current} / ${total}` : undefined,
             progress: { current, total },
             status: 'running',
@@ -144,8 +145,8 @@ export function TaskTrayProvider({ children }: { children: ReactNode }) {
         registerTask({
           id: `download-${key}`,
           type: 'download-godot',
-          label: `Downloading ${key}`,
-          description: 'Queued…',
+          label: i18n.t('taskTray.downloadingVersion', { version: key }),
+          description: i18n.t('taskTray.queuedDescription'),
           progress: null,
           status: 'queued',
         })
@@ -162,7 +163,7 @@ export function TaskTrayProvider({ children }: { children: ReactNode }) {
         registerTask({
           id,
           type: 'download-godot',
-          label: `Downloading ${tag}`,
+          label: i18n.t('taskTray.downloadingVersion', { version: tag }),
           description:
             total > 0
               ? `${(downloaded / 1024 / 1024).toFixed(1)} / ${(total / 1024 / 1024).toFixed(1)} MB (${pct}%)`
@@ -248,6 +249,6 @@ export function TaskTrayProvider({ children }: { children: ReactNode }) {
 export function useTaskTray() {
   const ctx = useContext(TaskTrayContext)
   if (!ctx)
-    throw new Error('useTaskTray must be used within a <TaskTrayProvider>')
+    throw new Error(i18n.t('taskTray.useTaskTrayError'))
   return ctx
 }

@@ -2,6 +2,7 @@ import { useEffect, useState, useRef, useCallback } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { getCurrentWebviewWindow } from '@tauri-apps/api/webviewWindow'
 import { listen } from '@tauri-apps/api/event'
+import { useTranslation } from 'react-i18next'
 import { ProjectsView } from './views/ProjectsView'
 import { VersionsView } from './views/VersionsView'
 import { NewsView } from './views/NewsView'
@@ -54,11 +55,11 @@ import { TaskTrayProvider } from './hooks/useTaskTray'
 
 type Tab = 'projects' | 'versions' | 'news' | 'templates' | 'settings' | 'changelog'
 
-const NAV_ITEMS: { tab: Tab; label: string; icon: typeof IconLayoutGrid }[] = [
-  { tab: 'projects', label: 'Projects', icon: IconLayoutGrid },
-  { tab: 'versions', label: 'Versions', icon: IconLayoutList },
-  { tab: 'templates', label: 'Templates', icon: IconCopy },
-  { tab: 'news', label: 'News', icon: IconNews },
+const NAV_ITEMS: { tab: Tab; labelKey: string; icon: typeof IconLayoutGrid }[] = [
+  { tab: 'projects', labelKey: 'nav.projects', icon: IconLayoutGrid },
+  { tab: 'versions', labelKey: 'nav.versions', icon: IconLayoutList },
+  { tab: 'templates', labelKey: 'nav.templates', icon: IconCopy },
+  { tab: 'news', labelKey: 'nav.news', icon: IconNews },
 ]
 
 const SIDEBAR_COLLAPSED_KEY = 'sidebar_collapsed'
@@ -84,6 +85,7 @@ function loadExpandedWidth(): number {
 }
 
 function AppContent() {
+  const { t } = useTranslation()
   const [tab, setTab] = useState<Tab>('projects')
   const tabRef = useRef(tab)
   tabRef.current = tab
@@ -567,12 +569,13 @@ const [bugReportOpen, setBugReportOpen] = useState(false)
           <nav
             className={`flex flex-col gap-1.5 mt-3 w-full ${collapsed ? 'items-center' : ''}`}
           >
-            {NAV_ITEMS.map(({ tab: t, label, icon: Icon }) => {
-              const active = tab === t
+            {NAV_ITEMS.map(({ tab: tabKey, labelKey, icon: Icon }) => {
+              const active = tab === tabKey
+              const label = t(labelKey)
               const btn = (
                 <button
-                  key={t}
-                  onClick={() => setTab(t)}
+                  key={tabKey}
+                  onClick={() => setTab(tabKey)}
                   aria-label={label}
                   className={`focus-ring cursor-pointer icon-wiggle relative flex items-center gap-3 py-2.5 rounded-lg text-sm font-medium transition-colors ${
                     collapsed
@@ -598,7 +601,7 @@ const [bugReportOpen, setBugReportOpen] = useState(false)
                 </button>
               )
               return collapsed ? (
-                <Tooltip key={t} content={label} side="right">
+                <Tooltip key={tabKey} content={label} side="right">
                   {btn}
                 </Tooltip>
               ) : (
@@ -623,7 +626,7 @@ const [bugReportOpen, setBugReportOpen] = useState(false)
                   <kbd className="font-mono text-[9px] px-1 py-0.5 rounded bg-raised border border-line">
                     {navigator.platform.includes('Mac') ? `⌘${paletteKey.toUpperCase()}` : `Ctrl+${paletteKey.toUpperCase()}`}
                   </kbd>
-                  <span>Quick commands</span>
+                  <span>{t('app.quickCommands')}</span>
                 </button>
               </div>
             )}            {(() => {
@@ -657,8 +660,8 @@ const [bugReportOpen, setBugReportOpen] = useState(false)
               }
               return (
                 <>
-                  {navButton('changelog', 'Changelog', IconBookOpen)}
-                  {navButton('settings', 'Settings', IconGear)}
+                  {navButton('changelog', t('nav.changelog'), IconBookOpen)}
+                  {navButton('settings', t('nav.settings'), IconGear)}
                 </>
               )
             })()}
@@ -667,7 +670,7 @@ const [bugReportOpen, setBugReportOpen] = useState(false)
           <div className="absolute -right-4 top-1/2 -translate-y-1/2 z-20">
               <button
                 onClick={toggleCollapsed}
-                aria-label={collapsed ? 'Expand sidebar' : 'Collapse sidebar'}
+                aria-label={collapsed ? t('app.expandSidebar') : t('app.collapseSidebar')}
                 className="focus-ring cursor-pointer w-8 h-8 flex items-center justify-center rounded-full bg-surface border border-line text-muted hover:text-ink hover:border-accent-dim transition-opacity opacity-0 group-hover:opacity-100 shadow-sm"
               >
                 {collapsed ? (
@@ -885,21 +888,17 @@ const [bugReportOpen, setBugReportOpen] = useState(false)
               <div className="text-center">
                 <p className="text-lg font-semibold text-ink">
                   {dragType === 'version'
-                    ? 'Drop your Godot .zip file'
-                    : 'Drop your Godot project folders'}
+                    ? t('app.dropVersionZip')
+                    : t('app.dropProjectFolders')}
                 </p>
                 <p className="text-sm mt-1">
                   {dragType === 'version' ? (
                     <span className="text-amber">
-                      The archive will be extracted and registered automatically
+                      {t('app.versionZipNote')}
                     </span>
                   ) : (
                     <span className="text-muted">
-                      Each folder must contain a{' '}
-                      <code className="font-mono text-xs px-1.5 py-0.5 rounded bg-raised border border-line">
-                        project.godot
-                      </code>{' '}
-                      file
+                      {t('app.projectFolderNote')}
                     </span>
                   )}
                 </p>
@@ -925,21 +924,21 @@ const [bugReportOpen, setBugReportOpen] = useState(false)
             <div className="flex-1 min-w-0">
               <p className="text-xs font-semibold text-mint uppercase tracking-wide">
                 {successNotification.count === 1
-                  ? 'Imported successfully'
-                  : `Imported ${successNotification.count} projects`}
+                  ? t('app.importedSuccessfully')
+                  : t('app.importedCountProjects', { count: successNotification.count })}
               </p>
               <p className="text-sm text-ink mt-0.5 truncate">
                 {successNotification.count === 1
                   ? successNotification.firstProjectName
                   : successNotification.failCount && successNotification.failCount > 0
-                    ? `${successNotification.count} succeeded, ${successNotification.failCount} failed`
-                    : `All ${successNotification.count} project folders imported`}
+                    ? t('app.countSucceededCountFailed', { succeeded: successNotification.count, failed: successNotification.failCount })
+                    : t('app.allCountImported', { count: successNotification.count })}
               </p>
             </div>
             <button
               onClick={() => setSuccessNotification(null)}
               className="focus-ring cursor-pointer shrink-0 p-1.5 rounded-lg text-muted hover:text-ink hover:bg-black/10 transition-colors"
-              aria-label="Dismiss"
+              aria-label={t('common.dismiss')}
             >
               <IconX className="w-3.5 h-3.5" />
             </button>
@@ -986,7 +985,7 @@ const [bugReportOpen, setBugReportOpen] = useState(false)
 
               <div>
                 <h3 className="font-display font-semibold text-lg text-ink">
-                  Starting…
+                  {t('app.starting')}
                 </h3>
                 <p className="text-sm text-muted mt-1">
                   {launchingProject.name}
@@ -1007,11 +1006,11 @@ const [bugReportOpen, setBugReportOpen] = useState(false)
                 className="focus-ring cursor-pointer flex items-center gap-2 px-5 py-2.5 rounded-lg border border-danger/40 text-danger hover:bg-danger/10 hover:border-danger text-sm font-medium transition-colors"
               >
                 <IconX className="w-4 h-4" />
-                Stop Launch
+                {t('app.stopLaunch')}
               </motion.button>
 
               <p className="text-[10px] text-muted/50">
-                Godot is launching in the background. This overlay will auto-dismiss.
+                {t('app.launchingNote')}
               </p>
             </motion.div>
           </motion.div>
@@ -1022,9 +1021,9 @@ const [bugReportOpen, setBugReportOpen] = useState(false)
       <AnimatePresence>
         {confirmingStop && launchingProject && (
           <ConfirmDialog
-            title="Stop Launch"
-            description={`Are you sure you want to cancel launching ${launchingProject.name}? Godot may already be starting up.`}
-            confirmLabel="Stop"
+            title={t('app.stopLaunch')}
+            description={t('app.stopLaunchDesc', { name: launchingProject.name })}
+            confirmLabel={t('app.stop')}
             variant="danger"
             onConfirm={() => {
               api.stopProject(launchingProject.id).catch(() => {})
@@ -1044,10 +1043,10 @@ const [bugReportOpen, setBugReportOpen] = useState(false)
               <IconRefresh className="w-6 h-6 animate-spin text-accent" />
               <p className="text-sm font-medium text-ink">
                 {importingOverlay.type === 'version'
-                  ? 'Importing version…'
+                  ? t('app.importingVersion')
                   : importingOverlay.total > 1
-                    ? `Importing project ${importingOverlay.current}/${importingOverlay.total}…`
-                    : 'Importing project…'}
+                    ? t('app.importingProjectCount', { current: importingOverlay.current, total: importingOverlay.total })
+                    : t('app.importingProject')}
               </p>
               {importingOverlay.total > 1 && (
                 <div className="h-1.5 w-full rounded-full bg-line overflow-hidden">
@@ -1063,7 +1062,7 @@ const [bugReportOpen, setBugReportOpen] = useState(false)
                 onClick={() => setImportingOverlay(null)}
                 className="focus-ring cursor-pointer text-xs text-muted hover:text-ink transition-colors mt-1"
               >
-                Resume in background
+                {t('app.resumeBackground')}
               </button>
             </div>
           </div>
@@ -1085,7 +1084,7 @@ const [bugReportOpen, setBugReportOpen] = useState(false)
             </div>
             <div className="flex-1 min-w-0">
               <p className="text-xs font-semibold text-danger uppercase tracking-wide">
-                Import failed
+                {t('app.importFailed')}
               </p>
               <p className="text-sm text-ink mt-0.5">
                 {errorNotification}
@@ -1094,7 +1093,7 @@ const [bugReportOpen, setBugReportOpen] = useState(false)
             <button
               onClick={() => setErrorNotification(null)}
               className="focus-ring cursor-pointer shrink-0 p-1.5 rounded-lg text-muted hover:text-ink hover:bg-black/10 transition-colors"
-              aria-label="Dismiss"
+              aria-label={t('common.dismiss')}
             >
               <IconX className="w-3.5 h-3.5" />
             </button>
@@ -1106,13 +1105,14 @@ const [bugReportOpen, setBugReportOpen] = useState(false)
 }
 
 export default function App() {
+  const { t } = useTranslation()
   const { settings, update, loaded } = useSettings()
   const { loaded: workspacesLoaded } = useWorkspaces()
 
   if (!loaded || !workspacesLoaded) {
     return (
       <div className="h-screen w-screen flex items-center justify-center bg-base text-muted text-sm">
-        Loading…
+        {t('common.loading')}
       </div>
     )
   }

@@ -10,8 +10,10 @@ import { IconStar, IconHeart } from './Icons'
 import { isMac } from '../lib/platform'
 import { TaskTray } from './TaskTray'
 import { Tooltip } from './ui/Tooltip'
+import { useTranslation } from 'react-i18next'
 
 export function TitleBar() {
+  const { t } = useTranslation()
   const [appWindow, setAppWindow] = useState<TauriWindow | null>(null)
   const [isMaximized, setIsMaximized] = useState(false)
   const [isHovered, setIsHovered] = useState(false)
@@ -86,10 +88,10 @@ export function TitleBar() {
 
       <div className={`flex items-stretch gap-1 ${isMac ? 'pr-3' : ''}`}>
         <div className="flex items-center gap-1 pl-3 pr-5">
-          <Tooltip content="Star on GitHub" side="bottom">
+          <Tooltip content={t('titlebar.starOnGithub')} side="bottom">
             <motion.button
               onClick={() => openUrl('https://github.com/RykoTheDev/GodotHub')}
-              aria-label="Star on GitHub"
+              aria-label={t('titlebar.starOnGithub')}
               className="focus-ring cursor-pointer w-7 h-7 flex items-center justify-center rounded-md text-muted/60 hover:text-amber hover:bg-amber/10 transition-colors"
               whileHover={{ scale: 1.1 }}
               whileTap={{ scale: 0.9 }}
@@ -97,10 +99,10 @@ export function TitleBar() {
               <IconStar className="w-3.5 h-3.5" />
             </motion.button>
           </Tooltip>
-          <Tooltip content="Support the Development" side="bottom">
+          <Tooltip content={t('titlebar.supportDevelopment')} side="bottom">
             <motion.button
               onClick={() => openUrl('https://www.patreon.com/cw/TheRyko/membership')}
-              aria-label="Support the Development"
+              aria-label={t('titlebar.supportDevelopment')}
               className="focus-ring cursor-pointer w-7 h-7 flex items-center justify-center rounded-md text-muted/60 hover:text-red-400 hover:bg-red-400/10 transition-colors"
               whileHover={{ scale: 1.1 }}
               whileTap={{ scale: 0.9 }}
@@ -117,7 +119,7 @@ export function TitleBar() {
             <div className="flex items-stretch gap-1 px-3">
               <motion.button
                 onClick={() => safe((w) => w.minimize())}
-                aria-label="Minimize"
+                aria-label={t('titlebar.minimize')}
                 className="w-6 cursor-pointer flex items-center justify-center text-muted hover:text-ink transition-colors shrink-0"
                 whileHover={{
                   y: -2,
@@ -134,7 +136,7 @@ export function TitleBar() {
 
               <motion.button
                 onClick={() => safe((w) => w.toggleMaximize())}
-                aria-label={isMaximized ? 'Restore' : 'Maximize'}
+                aria-label={isMaximized ? t('titlebar.restore') : t('titlebar.maximize')}
                 className="w-6 cursor-pointer flex items-center justify-center text-muted hover:text-ink transition-colors shrink-0"
                 whileHover={{
                   y: -2,
@@ -151,7 +153,7 @@ export function TitleBar() {
 
               <motion.button
                 onClick={() => safe((w) => w.close())}
-                aria-label="Close"
+                aria-label={t('titlebar.close')}
                 className="w-6 cursor-pointer flex items-center justify-center text-muted hover:text-white transition-colors shrink-0"
                 whileHover={{
                   y: -2,

@@ -5,6 +5,7 @@ import {
   IconDownload,
   IconX,
 } from './Icons'
+import { useTranslation } from 'react-i18next'
 
 interface Tip {
   title: string
@@ -12,29 +13,28 @@ interface Tip {
   icon: typeof IconSearch
 }
 
-const TIPS: Tip[] = [
-  {
-    title: 'Search Settings',
-    description:
-      'Use the search bar at the top of the Settings page to instantly find any option across all tabs.',
-    icon: IconSearch,
-  },
-  {
-    title: 'Command Palette',
-    description:
-      'Press Ctrl+K to open the command palette. Quickly navigate projects, versions, and settings from anywhere.',
-    icon: IconSearch,
-  },
-  {
-    title: 'Drag & Drop Import',
-    description:
-      'Drop Godot project folders or .zip version files anywhere on the window to instantly import them into your library.',
-    icon: IconDownload,
-  },
-]
-
 export function OnboardingTips({ onDismiss }: { onDismiss: () => void }) {
+  const { t } = useTranslation()
   const [step, setStep] = useState(0)
+
+  const TIPS: Tip[] = [
+    {
+      title: t('onboardingTips.searchSettingsTitle'),
+      description: t('onboardingTips.searchSettingsDesc'),
+      icon: IconSearch,
+    },
+    {
+      title: t('onboardingTips.commandPaletteTitle'),
+      description: t('onboardingTips.commandPaletteDesc'),
+      icon: IconSearch,
+    },
+    {
+      title: t('onboardingTips.dragDropTitle'),
+      description: t('onboardingTips.dragDropDesc'),
+      icon: IconDownload,
+    },
+  ]
+
   const current = TIPS[step]
   const isLast = step === TIPS.length - 1
 
@@ -69,7 +69,7 @@ export function OnboardingTips({ onDismiss }: { onDismiss: () => void }) {
                   ? 'bg-accent w-5'
                   : 'bg-line hover:bg-muted/50'
               }`}
-              aria-label={`Tip ${i + 1}`}
+              aria-label={t('onboardingTips.tip', { index: i + 1 })}
             />
           ))}
         </div>
@@ -98,7 +98,7 @@ export function OnboardingTips({ onDismiss }: { onDismiss: () => void }) {
               onClick={() => setStep((s) => Math.min(s + 1, TIPS.length - 1))}
               className="focus-ring cursor-pointer flex-1 px-4 py-2.5 rounded-lg bg-accent hover:bg-accent-bright text-white text-sm font-medium transition-colors"
             >
-              Next Tip
+              {t('onboardingTips.nextTip')}
             </motion.button>
           ) : (
             <motion.button
@@ -107,13 +107,13 @@ export function OnboardingTips({ onDismiss }: { onDismiss: () => void }) {
               onClick={onDismiss}
               className="focus-ring cursor-pointer flex-1 px-4 py-2.5 rounded-lg bg-accent hover:bg-accent-bright text-white text-sm font-medium transition-colors"
             >
-              Got It!
+              {t('onboardingTips.gotIt')}
             </motion.button>
           )}
           <button
             onClick={onDismiss}
             className="focus-ring cursor-pointer p-2.5 rounded-lg text-muted hover:text-ink hover:bg-raised transition-colors"
-            aria-label="Close"
+            aria-label={t('onboardingTips.close')}
           >
             <IconX className="w-4 h-4" />
           </button>

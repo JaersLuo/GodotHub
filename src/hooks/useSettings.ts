@@ -10,6 +10,7 @@ import { api } from '../lib/api'
 import { applyTheme } from '../lib/colors'
 import { applyAppearance } from '../lib/appearance'
 import { useWorkspaces } from './useWorkspaces'
+import i18n from '../i18n'
 import type { AppSettings } from '../types'
 
 const DEFAULTS: AppSettings = {
@@ -98,6 +99,6 @@ export function SettingsProvider({ children }: { children: ReactNode }) {
 export function useSettings() {
   const ctx = useContext(SettingsContext)
   if (!ctx)
-    throw new Error('useSettings() must be used within a <SettingsProvider>')
+    throw new Error(i18n.t('hooks.useSettingsError'))
   return ctx
 }

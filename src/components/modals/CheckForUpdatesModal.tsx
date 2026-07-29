@@ -1,4 +1,5 @@
 import { useState, useEffect, useCallback, useRef } from 'react'
+import { useTranslation } from 'react-i18next'
 import { motion } from 'framer-motion'
 import { check } from '@tauri-apps/plugin-updater'
 import { getVersion } from '@tauri-apps/api/app'
@@ -18,6 +19,7 @@ interface Props {
 }
 
 export function CheckForUpdatesModal({ onClose, mode = 'manual' }: Props) {
+  const { t } = useTranslation()
   const [state, setState] = useState<UpdateState>({ type: 'checking' })
   const [currentVersion, setCurrentVersion] = useState<string | null>(null)
   const onCloseRef = useRef(onClose)
@@ -105,13 +107,13 @@ export function CheckForUpdatesModal({ onClose, mode = 'manual' }: Props) {
       >
         <div className="flex items-center justify-between mb-5">
           <h3 className="font-display font-semibold text-lg text-ink">
-            Check for Updates
+            {t('updates:title')}
           </h3>
           <button
             type="button"
             onClick={onClose}
             className="focus-ring cursor-pointer p-1.5 rounded-lg text-muted hover:text-ink hover:bg-raised transition-colors"
-            aria-label="Close"
+            aria-label={t('common:close')}
           >
             <IconX className="w-4 h-4" />
           </button>
@@ -123,7 +125,7 @@ export function CheckForUpdatesModal({ onClose, mode = 'manual' }: Props) {
               <div className="w-14 h-14 rounded-full bg-accent/10 flex items-center justify-center">
                 <IconRefresh className="w-6 h-6 text-accent animate-spin" />
               </div>
-              <p className="text-sm text-muted">Checking for updates…</p>
+              <p className="text-sm text-muted">{t('updates:checking')}</p>
             </div>
           )}
 
@@ -133,9 +135,9 @@ export function CheckForUpdatesModal({ onClose, mode = 'manual' }: Props) {
                 <IconCheck className="w-6 h-6 text-mint" />
               </div>
               <div className="text-center">
-                <p className="text-sm font-medium text-ink">GodotHub is already up to date</p>
+                <p className="text-sm font-medium text-ink">{t('updates:upToDate')}</p>
                 <p className="text-xs text-muted mt-1">
-                  v{currentVersion ?? '?'} is the latest version.
+                  {t('updates:latestVersion', { version: currentVersion ?? '?' })}
                 </p>
               </div>
             </div>
@@ -148,16 +150,16 @@ export function CheckForUpdatesModal({ onClose, mode = 'manual' }: Props) {
               </div>
               <div className="text-center">
                 <p className="text-sm font-medium text-ink">
-                  Version {state.version} available
+                  {t('updates:versionAvailable', { version: state.version })}
                 </p>
                 <p className="text-xs text-muted mt-1">
-                  Would you like to download and install it now?
+                  {t('updates:downloadInstallPrompt')}
                 </p>
               </div>
               {state.notes && (
                 <div className="w-full bg-raised rounded-xl border border-line p-4 max-h-32 overflow-y-auto">
                   <p className="text-[11px] font-medium text-muted uppercase tracking-wider mb-2">
-                    Release Notes
+                    {t('updates:releaseNotes')}
                   </p>
                   <pre className="text-xs text-ink whitespace-pre-wrap font-sans leading-relaxed">
                     {state.notes}
@@ -171,7 +173,7 @@ export function CheckForUpdatesModal({ onClose, mode = 'manual' }: Props) {
                 className="focus-ring cursor-pointer flex items-center gap-2 px-6 py-2.5 rounded-lg bg-accent hover:bg-accent-bright text-sm font-medium text-white transition-colors"
               >
                 <IconDownload className="w-4 h-4" />
-                Download & Install
+                {t('updates:downloadInstall')}
               </motion.button>
             </div>
           )}
@@ -182,9 +184,9 @@ export function CheckForUpdatesModal({ onClose, mode = 'manual' }: Props) {
                 <IconDownload className="w-6 h-6 text-accent animate-pulse" />
               </div>
               <div className="text-center w-full">
-                <p className="text-sm font-medium text-ink">Downloading update…</p>
+                <p className="text-sm font-medium text-ink">{t('updates:downloading')}</p>
                 <p className="text-xs text-muted mt-1">
-                  {Math.round(state.progress * 100)}% complete
+                  {t('updates:percentComplete', { percent: Math.round(state.progress * 100) })}
                 </p>
               </div>
               <div className="w-full h-2 rounded-full bg-line overflow-hidden">
@@ -204,15 +206,13 @@ export function CheckForUpdatesModal({ onClose, mode = 'manual' }: Props) {
                 <IconCheck className="w-6 h-6 text-mint" />
               </div>
               <div className="text-center">
-                <p className="text-sm font-medium text-ink">Update downloaded!</p>
+                <p className="text-sm font-medium text-ink">{t('updates:downloaded')}</p>
                 <p className="text-xs text-muted mt-1">
-                  Restart GodotHub to apply the update.
+                  {t('updates:restartToApply')}
                 </p>
               </div>
               <p className="text-[11px] text-muted/70 text-center max-w-xs">
-                The update has been downloaded and will be applied the next time
-                you restart GodotHub. Please close and reopen the app to finish
-                the update.
+                {t('updates:downloadedDescription')}
               </p>
             </div>
           )}
@@ -223,7 +223,7 @@ export function CheckForUpdatesModal({ onClose, mode = 'manual' }: Props) {
                 <IconX className="w-6 h-6 text-danger" />
               </div>
               <div className="text-center">
-                <p className="text-sm font-medium text-ink">Update check failed</p>
+                <p className="text-sm font-medium text-ink">{t('updates:checkFailed')}</p>
                 <p className="text-xs text-muted mt-1 max-w-xs">
                   {state.message}
                 </p>
@@ -235,7 +235,7 @@ export function CheckForUpdatesModal({ onClose, mode = 'manual' }: Props) {
                 className="focus-ring cursor-pointer flex items-center gap-2 px-5 py-2.5 rounded-lg border border-line hover:border-accent-dim hover:bg-raised text-sm font-medium text-ink transition-colors"
               >
                 <IconRefresh className="w-4 h-4" />
-                Try Again
+                {t('updates:tryAgain')}
               </motion.button>
             </div>
           )}
@@ -247,7 +247,7 @@ export function CheckForUpdatesModal({ onClose, mode = 'manual' }: Props) {
             onClick={onClose}
             className="focus-ring cursor-pointer px-4 py-2 rounded-lg text-xs font-medium text-muted hover:text-ink hover:bg-raised transition-colors"
           >
-            Close
+            {t('common:close')}
           </motion.button>
         </div>
       </motion.div>

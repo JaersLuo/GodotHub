@@ -23,6 +23,7 @@ import {
   sortableKeyboardCoordinates,
 } from '@dnd-kit/sortable'
 import { CSS } from '@dnd-kit/utilities'
+import { useTranslation } from 'react-i18next'
 import { useProjectsContext } from '../hooks/projectsContext'
 import { useCategoriesContext } from '../hooks/categoriesContext'
 import { useSettings } from '../hooks/useSettings'
@@ -108,6 +109,7 @@ function SortableProjectCard({
 }
 
 function ZoneDropArea({ zoneKey }: { zoneKey: string }) {
+  const { t } = useTranslation()
   const { setNodeRef, isOver } = useDroppable({
     id: zoneKey,
     data: { type: 'zone', zoneKey },
@@ -131,12 +133,12 @@ function ZoneDropArea({ zoneKey }: { zoneKey: string }) {
           <span className={`text-xs transition-all duration-150 ${
             isOver ? 'text-accent font-semibold' : 'text-muted/40'
           }`}>
-            {isOver ? 'Drop here' : 'No projects'}
+            {isOver ? t('projects:zoneDropHere') : t('projects:zoneNoProjects')}
           </span>
           <span className={`text-[10px] transition-all duration-150 ${
             isOver ? 'text-accent/70' : 'text-muted/30'
           }`}>
-            {isOver ? 'Release to move project here' : 'Drag a project to add it'}
+            {isOver ? t('projects:zoneReleaseToMove') : t('projects:zoneDragToAdd')}
           </span>
         </div>
       </div>
@@ -149,6 +151,7 @@ export function ProjectsView({
 }: {
   onShowGitSidebar?: (project: Project, gitStatus: GitStatus | null) => void
 }) {
+  const { t } = useTranslation()
   const {
     projects,
     loaded,
@@ -408,7 +411,7 @@ export function ProjectsView({
     keys.push(UNCATEGORIZED)
     return keys.map((key) => ({
       key,
-      label: key === UNCATEGORIZED ? 'Uncategorized' : key,
+      label: key === UNCATEGORIZED ? t('projects:uncategorized') : key,
       items: groups.get(key)!,
     }))
   }, [filteredProjects, availableCategories, showCategories, sortProjects])
@@ -625,11 +628,11 @@ export function ProjectsView({
           await api.openTerminal(project.path)
         } else if (action === 'pull') {
           const result = await api.gitPull(project.path)
-          alert(result || 'Pull completed successfully.')
+          alert(result || t('projects:pullCompleted'))
           setTimeout(fetchGitStatuses, 2000)
         } else if (action === 'push') {
           const result = await api.gitPush(project.path)
-          alert(result || 'Push completed successfully.')
+          alert(result || t('projects:pushCompleted'))
           setTimeout(fetchGitStatuses, 2000)
         } else if (action === 'fetch') {
           await api.gitFetch(project.path)
@@ -794,12 +797,12 @@ export function ProjectsView({
       <div className="flex items-center justify-between mb-6">
         <div>
           <h2 className="font-body font-semibold text-3xl tracking-tight">
-            PROJECTS
+            {t('projects:title')}
           </h2>
           <p className="text-xs text-muted">
-            {projects.length} project{projects.length === 1 ? '' : 's'}
+            {t('projects:projectCount', { count: projects.length })}
             {isSearching && (
-              <> · Showing {filteredProjects.length}</>
+              <> · {t('projects:showingCount', { count: filteredProjects.length })}</>
             )}
           </p>
         </div>
@@ -814,7 +817,7 @@ export function ProjectsView({
             <span className="icon-wiggle inline-flex">
               <IconFolderPlus className="w-4 h-4" />
             </span>
-            New Project
+            {t('projects:newProject')}
           </motion.button>
 
           {/* Import split button, main action + clone dropdown */}
@@ -830,14 +833,14 @@ export function ProjectsView({
                 <span className="icon-wiggle inline-flex">
                   <IconImport className="w-4 h-4" />
                 </span>
-                Import
+                {t('projects:import')}
               </motion.button>
               <motion.button
                 whileHover={{ y: -1 }}
                 whileTap={{ scale: 0.96 }}
                 onClick={() => setImportDropdownOpen((prev) => !prev)}
                 className="focus-ring cursor-pointer px-2 py-2.5 text-muted hover:text-ink transition-colors"
-                aria-label="More import options"
+                aria-label={t('projects:moreImportOptions')}
               >
                 <IconChevronDown className={`w-3 h-3 transition-transform duration-200 ${importDropdownOpen ? 'rotate-180 text-accent' : ''}`} />
               </motion.button>
@@ -857,7 +860,7 @@ export function ProjectsView({
                     className="w-full flex items-center cursor-pointer gap-2.5 px-5 py-2 rounded-lg text-xs font-medium text-ink hover:bg-raised transition-colors"
                   >
                     <IconGitBranch className="w-4 h-4 text-muted" />
-                    Clone & Import from Repository
+                    {t('projects:cloneAndImport')}
                   </button>
                 </motion.div>
               )}
@@ -865,7 +868,7 @@ export function ProjectsView({
           </div>
 
           {/* Scan Now, icon only with tooltip */}
-          <Tooltip content={scanning ? 'Scanning…' : 'Scan for Projects'} side="bottom">
+          <Tooltip content={scanning ? t('projects:scanning') : t('projects:scanForProjects')} side="bottom">
             <motion.button
               whileHover={{ y: -1 }}
               whileTap={{ scale: 0.96 }}
@@ -879,13 +882,13 @@ export function ProjectsView({
 
           {/* Categories, icon only with tooltip */}
           {categoriesEnabled && (
-            <Tooltip content="Manage Categories" side="bottom">
+            <Tooltip content={t('projects:manageCategories')} side="bottom">
               <motion.button
                 whileHover={{ y: -1 }}
                 whileTap={{ scale: 0.96 }}
                 onClick={() => setCategoryModalOpen(true)}
                 className="focus-ring cursor-pointer p-2.5 rounded-lg border border-line hover:border-accent-dim hover:bg-raised text-muted hover:text-ink transition-colors"
-                aria-label="Manage Categories"
+                aria-label={t('projects:manageCategories')}
               >
                 <IconTags className="w-4 h-4" />
               </motion.button>
@@ -905,14 +908,14 @@ export function ProjectsView({
               type="text"
               value={query}
               onChange={(e) => setQuery(e.target.value)}
-              placeholder="Search projects by name or path…"
+              placeholder={t('projects:searchPlaceholder')}
               className="focus-ring w-full bg-surface border border-line rounded-lg pl-9 pr-9 py-2.5 text-sm text-ink placeholder:text-muted transition-colors focus:border-accent-dim"
             />
             {isSearching && (
               <button
                 type="button"
                 onClick={() => setQuery('')}
-                aria-label="Clear search"
+                aria-label={t('projects:clearSearch')}
                 className="focus-ring cursor-pointer absolute right-2.5 top-1/2 -translate-y-1/2 p-1 rounded-md text-muted hover:text-ink hover:bg-raised transition-colors"
               >
                 <IconX className="w-3.5 h-3.5" />
@@ -926,7 +929,7 @@ export function ProjectsView({
               className="w-44"
               value={sortBy}
               onChange={(v) => setSortBy((v || 'categories') as ProjectSortOption)}
-              emptyLabel="Sort…"
+              emptyLabel={t('projects:sortPlaceholder')}
               options={SORT_OPTIONS.filter(
                 (opt) => categoriesEnabled || opt.value !== 'categories',
               )}
@@ -941,7 +944,7 @@ export function ProjectsView({
             <IconRefresh className="w-5 h-5 text-muted animate-spin" />
           </div>
           <p className="text-sm text-muted max-w-xs leading-relaxed">
-            Loading projects…
+            {t('projects:loadingProjects')}
           </p>
         </div>
       ) : !hasAnyProjects ? (
@@ -950,8 +953,7 @@ export function ProjectsView({
             <IconNode className="w-5 h-5 text-muted" />
           </div>
           <p className="text-sm text-muted max-w-xs leading-relaxed">
-            Nothing here yet. Create a new project or import one you already
-            have on disk.
+            {t('projects:emptyState')}
           </p>
         </div>
       ) : !hasVisibleProjects ? (
@@ -960,7 +962,7 @@ export function ProjectsView({
             <IconSearch fill="none" className="w-5 h-5 text-muted" />
           </div>
           <p className="text-sm text-muted max-w-xs leading-relaxed">
-            No projects match &ldquo;{query.trim()}&rdquo;.
+            {t('projects:noMatch', { query: query.trim() })}
           </p>
         </div>
       ) : (
@@ -1000,11 +1002,11 @@ export function ProjectsView({
                       fill="currentColor"
                     />
                     <h3 className="text-xs font-semibold uppercase tracking-wide text-muted">
-                      Pinned
+                      {t('projects:pinned')}
                     </h3>
                     {activeId && isOverPinned && (
                       <span className="ml-1 text-[10px] font-medium text-accent animate-pulse">
-                        Drop here
+                        {t('projects:dropHere')}
                       </span>
                     )}
                   </div>
@@ -1060,7 +1062,7 @@ export function ProjectsView({
                 const collapsed = collapsedCats[key]
                 const isOver = overContainer === key
                 const catColor =
-                  label === 'Uncategorized'
+                  label === t('projects:uncategorized')
                     ? undefined
                     : categories.find((c) => c.name === label)?.color
                 const isEmpty = ids.length === 0
@@ -1076,7 +1078,7 @@ export function ProjectsView({
                         }
                         onPointerDown={(e) => e.stopPropagation()}
                         className="focus-ring cursor-pointer inline-flex items-center justify-center w-5 h-5 rounded hover:ring-1 hover:bg-raised transition-all"
-                        aria-label={collapsed ? `Expand ${label}` : `Collapse ${label}`}
+                        aria-label={collapsed ? t('projects:expandCategory', { label }) : t('projects:collapseCategory', { label })}
                         style={
                           catColor
                             ? ({ '--tw-ring-color': catColor } as React.CSSProperties)
@@ -1094,7 +1096,7 @@ export function ProjectsView({
                       </span>
                       {activeId && isOver && (
                         <span className="ml-1 text-[10px] font-medium text-accent animate-pulse normal-case">
-                          Drop here
+                          {t('projects:dropHere')}
                         </span>
                       )}
                     </div>
@@ -1176,7 +1178,7 @@ export function ProjectsView({
             className="fixed bottom-6 left-1/2 -translate-x-1/2 z-50 flex items-center gap-2 px-4 py-2.5 rounded-2xl bg-surface border border-line shadow-2xl shadow-black/40"
           >
             <span className="text-xs font-medium text-muted whitespace-nowrap mr-1">
-              {selectedCount} selected
+              {t('projects:selectedCount', { count: selectedCount })}
             </span>
 
             <motion.button
@@ -1190,19 +1192,19 @@ export function ProjectsView({
                 }
               }}
               className="focus-ring cursor-pointer px-2.5 py-1.5 rounded-lg text-xs font-semibold text-muted hover:text-ink hover:bg-raised transition-colors"
-              aria-label={selectedIds.size === allVisibleIdsRef.current.length && allVisibleIdsRef.current.length > 0 ? 'Deselect all' : 'Select all'}
+              aria-label={selectedIds.size === allVisibleIdsRef.current.length && allVisibleIdsRef.current.length > 0 ? t('projects:deselectAll') : t('projects:selectAll')}
             >
-              {selectedIds.size === allVisibleIdsRef.current.length && allVisibleIdsRef.current.length > 0 ? 'Deselect all' : 'Select all'}
+              {selectedIds.size === allVisibleIdsRef.current.length && allVisibleIdsRef.current.length > 0 ? t('projects:deselectAll') : t('projects:selectAll')}
             </motion.button>
 
             <div className="h-5 w-px bg-line/60" />
 
-            <Tooltip content={selectedIds.size === 1 ? 'Toggle pin' : 'Pin / Unpin all'} side="top">
+            <Tooltip content={selectedIds.size === 1 ? t('projects:togglePin') : t('projects:pinUnpinAll')} side="top">
               <motion.button
                 whileTap={{ scale: 0.92 }}
                 onClick={handleBatchPin}
                 className="focus-ring cursor-pointer p-1.5 rounded-lg text-muted hover:text-ink hover:bg-raised transition-colors"
-                aria-label="Toggle pin"
+                aria-label={t('projects:togglePin')}
               >
                 <IconPin className="w-3.5 h-3.5" fill="none" />
               </motion.button>
@@ -1212,7 +1214,7 @@ export function ProjectsView({
               className="w-44"
               value=""
               onChange={(tag) => tag && handleBatchVersionChange(tag)}
-              emptyLabel="Set version…"
+              emptyLabel={t('projects:setVersion')}
               openUp
               options={installed.map((v) => ({
                 value: v.tag,
@@ -1231,11 +1233,11 @@ export function ProjectsView({
                   handleBatchCategoryChange(resolved)
                 }
               }}
-              emptyLabel="Set category…"
+              emptyLabel={t('projects:setCategory')}
               openUp
               options={availableCategories.map((c) => ({
                 value: c,
-                label: c === UNCATEGORIZED ? 'Uncategorized' : c,
+                label: c === UNCATEGORIZED ? t('projects:uncategorized') : c,
               }))}
             />
 
@@ -1245,19 +1247,19 @@ export function ProjectsView({
               whileTap={{ scale: 0.95 }}
               onClick={handleBatchRemove}
               className="focus-ring cursor-pointer px-2.5 py-1.5 rounded-lg text-xs font-semibold text-muted hover:text-danger hover:bg-danger/10 transition-colors"
-              aria-label="Remove selected"
+              aria-label={t('projects:removeSelected')}
             >
-              Remove
+              {t('projects:remove')}
             </motion.button>
 
             <div className="h-5 w-px bg-line/60" />
 
-            <Tooltip content="Clear selection" side="top">
+            <Tooltip content={t('projects:clearSelection')} side="top">
               <motion.button
                 whileTap={{ scale: 0.92 }}
                 onClick={handleClearSelection}
                 className="focus-ring cursor-pointer p-1.5 rounded-lg text-muted hover:text-ink hover:bg-raised transition-colors ml-1"
-                aria-label="Clear selection"
+                aria-label={t('projects:clearSelection')}
               >
                 <IconX className="w-3.5 h-3.5" />
               </motion.button>
@@ -1269,9 +1271,9 @@ export function ProjectsView({
       <AnimatePresence>
         {confirmBatchRemove && (
           <ConfirmDialog
-            title={`Remove ${selectedCount} project${selectedCount === 1 ? '' : 's'} from library?`}
-            description={`The project${selectedCount === 1 ? '' : 's'} will be removed from GodotHub's list. Files stay on disk untouched, you can import ${selectedCount === 1 ? 'it' : 'them'} again anytime.`}
-            confirmLabel={`Remove ${selectedCount}`}
+            title={t('projects:confirmRemoveTitle', { count: selectedCount })}
+            description={t('projects:confirmRemoveDescription', { count: selectedCount })}
+            confirmLabel={t('projects:confirmRemoveLabel', { count: selectedCount })}
             variant="danger"
             onConfirm={executeBatchRemove}
             onCancel={() => setConfirmBatchRemove(false)}
@@ -1282,9 +1284,9 @@ export function ProjectsView({
       <AnimatePresence>
         {confirmBatchPin && (
           <ConfirmDialog
-            title={`${selectedIds.size === 1 ? 'Toggle pin' : 'Pin / Unpin all'} for ${selectedCount} project${selectedCount === 1 ? '' : 's'}?`}
-            description={`This will ${[...selectedIds].every((id) => projectsById.get(id)?.pinned) ? 'unpin' : 'pin'} all selected projects.`}
-            confirmLabel="Confirm"
+            title={t('projects:confirmPinTitle', { count: selectedCount, isSingle: selectedCount === 1 })}
+            description={t('projects:confirmPinDescription', { action: [...selectedIds].every((id) => projectsById.get(id)?.pinned) ? t('projects:actionUnpin') : t('projects:actionPin') })}
+            confirmLabel={t('common:confirm')}
             variant="default"
             onConfirm={executeBatchPin}
             onCancel={() => setConfirmBatchPin(false)}
@@ -1295,9 +1297,9 @@ export function ProjectsView({
       <AnimatePresence>
         {confirmBatchVersion && (
           <ConfirmDialog
-            title={`Set version for ${selectedCount} project${selectedCount === 1 ? '' : 's'}?`}
-            description={`Change the Godot version to "${confirmBatchVersion}" for all selected projects.`}
-            confirmLabel={`Set to ${confirmBatchVersion}`}
+            title={t('projects:confirmVersionTitle', { count: selectedCount })}
+            description={t('projects:confirmVersionDescription', { version: confirmBatchVersion })}
+            confirmLabel={t('projects:confirmVersionLabel', { version: confirmBatchVersion })}
             variant="default"
             onConfirm={executeBatchVersionChange}
             onCancel={() => setConfirmBatchVersion(null)}
@@ -1308,9 +1310,9 @@ export function ProjectsView({
       <AnimatePresence>
         {confirmBatchCategory != null && (
           <ConfirmDialog
-            title={`Set category for ${selectedCount} project${selectedCount === 1 ? '' : 's'}?`}
-            description={`Change the category to "${confirmBatchCategory === '' ? 'Uncategorized' : confirmBatchCategory}" for all selected projects.`}
-            confirmLabel={`Set to ${confirmBatchCategory === '' ? 'Uncategorized' : confirmBatchCategory}`}
+            title={t('projects:confirmCategoryTitle', { count: selectedCount })}
+            description={t('projects:confirmCategoryDescription', { category: confirmBatchCategory === '' ? t('projects:uncategorized') : confirmBatchCategory })}
+            confirmLabel={t('projects:confirmCategoryLabel', { category: confirmBatchCategory === '' ? t('projects:uncategorized') : confirmBatchCategory })}
             variant="default"
             onConfirm={executeBatchCategoryChange}
             onCancel={() => setConfirmBatchCategory(null)}
@@ -1333,10 +1335,10 @@ export function ProjectsView({
             </div>
             <div className="flex-1 min-w-0">
               <p className="text-xs font-semibold text-ink uppercase tracking-wide">
-                Removed from library
+                {t('projects:removedFromLibrary')}
               </p>
               <p className="text-sm text-muted mt-0.5 truncate">
-                {undoBatchData.paths.length} project{undoBatchData.paths.length === 1 ? '' : 's'} removed
+                {t('projects:projectsRemoved', { count: undoBatchData.paths.length })}
               </p>
             </div>
             <motion.button
@@ -1345,13 +1347,13 @@ export function ProjectsView({
               onClick={handleUndoBatchRemove}
               className="focus-ring cursor-pointer shrink-0 px-3 py-1.5 rounded-lg bg-accent/10 border border-accent/20 text-accent-bright text-xs font-semibold hover:bg-accent/20 transition-colors"
             >
-              Undo
+              {t('common:undo')}
             </motion.button>
-            <Tooltip content="Dismiss" side="bottom">
+            <Tooltip content={t('common:dismiss')} side="bottom">
               <button
                 onClick={() => setUndoBatchData(null)}
                 className="focus-ring cursor-pointer shrink-0 p-1.5 rounded-lg text-muted hover:text-ink hover:bg-raised transition-colors"
-                aria-label="Dismiss"
+                aria-label={t('common:dismiss')}
               >
                 <IconX className="w-3.5 h-3.5" />
               </button>
@@ -1411,10 +1413,10 @@ export function ProjectsView({
             <IconRefresh className="w-6 h-6 animate-spin text-accent" />
             <p className="text-sm font-medium text-ink">
               {importing
-                ? 'Importing project…'
+                ? t('projects:importingProject')
                 : scanProgress && scanProgress.total > 0
-                  ? `Importing ${scanProgress.current}/${scanProgress.total} projects…`
-                  : 'Scanning for projects…'}
+                  ? t('projects:importingProjectCount', { current: scanProgress.current, total: scanProgress.total })
+                  : t('projects:scanningForProjects')}
             </p>
             {scanProgress && scanProgress.total > 0 && (
               <div className="h-1.5 w-full rounded-full bg-line overflow-hidden">
@@ -1430,7 +1432,7 @@ export function ProjectsView({
               onClick={() => setDialogMinimized(true)}
               className="focus-ring cursor-pointer text-xs text-muted hover:text-ink transition-colors mt-1"
             >
-              Resume in background
+              {t('common:resumeBackground')}
             </button>
           </div>
         </div>

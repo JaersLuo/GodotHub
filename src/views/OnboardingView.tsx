@@ -1,5 +1,6 @@
 import { useMemo, useState } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
+import { useTranslation } from 'react-i18next'
 import { applyTheme } from '../lib/colors'
 import { applyRadius } from '../lib/appearance'
 import { useCategoriesContext } from '../hooks/categoriesContext'
@@ -100,12 +101,12 @@ const BG_PRESETS_LIGHT = [
   '#faf6f0',
 ]
 
-const STARTER_CATEGORIES = [
-  'In Progress',
-  'Prototypes',
-  'Finished',
-  'Game Jams',
-]
+const STARTER_CATEGORY_KEYS = [
+  'categories.starter.inProgress',
+  'categories.starter.prototypes',
+  'categories.starter.finished',
+  'categories.starter.gameJams',
+] as const
 
 interface Props {
   settings: AppSettings
@@ -115,14 +116,14 @@ interface Props {
 type StepId =
   'welcome' | 'projects' | 'versions' | 'templates' | 'categories' | 'customize' | 'finish'
 
-const ALL_STEPS: { id: StepId; label: string }[] = [
-  { id: 'welcome', label: 'Welcome' },
-  { id: 'projects', label: 'Projects' },
-  { id: 'versions', label: 'Godot Versions' },
-  { id: 'templates', label: 'Templates' },
-  { id: 'categories', label: 'Categories' },
-  { id: 'customize', label: 'Customize' },
-  { id: 'finish', label: 'Finish' },
+const ALL_STEPS: { id: StepId; labelKey: string }[] = [
+  { id: 'welcome', labelKey: 'steps.welcome' },
+  { id: 'projects', labelKey: 'steps.projects' },
+  { id: 'versions', labelKey: 'steps.versions' },
+  { id: 'templates', labelKey: 'steps.templates' },
+  { id: 'categories', labelKey: 'steps.categories' },
+  { id: 'customize', labelKey: 'steps.customize' },
+  { id: 'finish', labelKey: 'steps.finish' },
 ]
 
 function StepShell({
@@ -157,6 +158,7 @@ function StepShell({
 }
 
 export function OnboardingView({ settings, onComplete }: Props) {
+  const { t } = useTranslation('onboarding')
   const STEPS = useMemo(
     () =>
       ALL_STEPS.filter(
@@ -237,7 +239,7 @@ export function OnboardingView({ settings, onComplete }: Props) {
           {STEPS.map((s, i) => (
             <div
               key={s.id}
-              title={s.label}
+              title={t(s.labelKey)}
               className={`h-1.5 rounded-full transition-all duration-300 ${
                 i === stepIndex
                   ? 'w-8 bg-accent'
@@ -261,29 +263,29 @@ export function OnboardingView({ settings, onComplete }: Props) {
             {step.id === 'welcome' && (
               <StepShell
                 icon={<span className="font-black italic text-lg">GH</span>}
-                title="Welcome to GodotHub"
-                description="A home for every Godot project and engine version on this machine. Let's set a few things up so it works the way you want, it only takes a minute, and everything here can be changed later in Settings."
+                title={t('welcome.title')}
+                description={t('welcome.description')}
               >
                 <div className="grid grid-cols-3 gap-3">
                   <div className="flex flex-col gap-2 p-4 rounded-xl border border-line bg-surface/60">
                     <IconLayoutGrid className="w-4 h-4 text-accent-bright" />
-                    <span className="text-xs font-medium">Projects</span>
+                    <span className="text-xs font-medium">{t('welcome.projects')}</span>
                     <p className="text-[11px] text-muted leading-relaxed">
-                      Keep every project organized in one place.
+                      {t('welcome.projectsDesc')}
                     </p>
                   </div>
                   <div className="flex flex-col gap-2 p-4 rounded-xl border border-line bg-surface/60">
                     <IconLayoutList className="w-4 h-4 text-accent-bright" />
-                    <span className="text-xs font-medium">Versions</span>
+                    <span className="text-xs font-medium">{t('welcome.versions')}</span>
                     <p className="text-[11px] text-muted leading-relaxed">
-                      Download and manage Godot engine builds.
+                      {t('welcome.versionsDesc')}
                     </p>
                   </div>
                   <div className="flex flex-col gap-2 p-4 rounded-xl border border-line bg-surface/60">
                     <IconNews className="w-4 h-4 text-accent-bright" />
-                    <span className="text-xs font-medium">News</span>
+                    <span className="text-xs font-medium">{t('welcome.news')}</span>
                     <p className="text-[11px] text-muted leading-relaxed">
-                      Stay current with what's new in Godot.
+                      {t('welcome.newsDesc')}
                     </p>
                   </div>
                 </div>
@@ -293,18 +295,18 @@ export function OnboardingView({ settings, onComplete }: Props) {
             {step.id === 'projects' && (
               <StepShell
                 icon={<IconFolderPlus className="w-5 h-5" />}
-                title="Where are your projects?"
-                description="Add folders GodotHub should scan for existing Godot projects at startup. Star one to make it the default save location when you create a new project. You can skip this and add folders later in Settings."
+                title={t('projects.title')}
+                description={t('projects.description')}
               >
                 <DirList
                   dirs={draft.project_scan_dirs}
                   onChange={(dirs) => setField('project_scan_dirs', dirs)}
-                  emptyHint="No folders added yet, GodotHub won't find any existing projects until you add one, or you can add projects manually later."
+                  emptyHint={t('projects.emptyHint')}
                   defaultDir={draft.default_project_location}
                   onSetDefault={(dir) =>
                     setField('default_project_location', dir)
                   }
-                  defaultLabel="New project default"
+                  defaultLabel={t('projects.defaultLabel')}
                 />
               </StepShell>
             )}
@@ -312,16 +314,16 @@ export function OnboardingView({ settings, onComplete }: Props) {
             {step.id === 'versions' && (
               <StepShell
                 icon={<IconDownload className="w-5 h-5" />}
-                title="Where do Godot versions live?"
-                description="Add folders GodotHub should scan for installed Godot engine executables. Star one to set it as the download location for new versions you install through the Versions tab."
+                title={t('versions.title')}
+                description={t('versions.description')}
               >
                 <DirList
                   dirs={draft.version_scan_dirs}
                   onChange={(dirs) => setField('version_scan_dirs', dirs)}
-                  emptyHint="No folders added yet, new Godot downloads will go to the app data folder unless you set one below."
+                  emptyHint={t('versions.emptyHint')}
                   defaultDir={draft.download_dir}
                   onSetDefault={(dir) => setField('download_dir', dir)}
-                  defaultLabel="Download folder"
+                  defaultLabel={t('versions.defaultLabel')}
                 />
               </StepShell>
             )}
@@ -329,8 +331,8 @@ export function OnboardingView({ settings, onComplete }: Props) {
             {step.id === 'templates' && (
               <StepShell
                 icon={<IconCopy className="w-5 h-5" />}
-                title="Template projects directory"
-                description="Optionally set a folder where you keep reusable project templates. Any subfolder inside it will be imported as templates on finish, so they show up when you create new projects. You can also save individual projects as templates anytime from the Projects view, or import more later from the Templates tab."
+                title={t('templates.title')}
+                description={t('templates.description')}
               >
                 <div className="flex flex-col gap-3 w-full">
                   <div className="flex items-center gap-2.5">
@@ -342,8 +344,7 @@ export function OnboardingView({ settings, onComplete }: Props) {
                       />
                     ) : (
                       <span className="text-xs text-muted">
-                        No folder set, you can always configure this later in
-                        Settings, or save templates manually.
+                        {t('templates.noFolderHint')}
                       </span>
                     )}
                     <motion.button
@@ -355,7 +356,7 @@ export function OnboardingView({ settings, onComplete }: Props) {
                       }}
                       className="focus-ring cursor-pointer px-4 py-2.5 rounded-lg border border-line hover:border-accent-dim hover:bg-raised text-sm transition-colors"
                     >
-                      Browse
+                      {t('templates.browse')}
                     </motion.button>
                     {draft.template_scan_dir && (
                       <motion.button
@@ -364,7 +365,7 @@ export function OnboardingView({ settings, onComplete }: Props) {
                         onClick={() => setField('template_scan_dir', null)}
                         className="focus-ring cursor-pointer px-3 py-2.5 rounded-lg border border-line text-xs text-muted hover:text-danger hover:border-danger/30 hover:bg-danger/10 transition-colors"
                       >
-                        Clear
+                        {t('templates.clear')}
                       </motion.button>
                     )}
                   </div>
@@ -375,18 +376,19 @@ export function OnboardingView({ settings, onComplete }: Props) {
             {step.id === 'categories' && (
               <StepShell
                 icon={<IconTags className="w-5 h-5" />}
-                title="Organize with categories"
-                description="Categories are folders for your project list, file projects under them however makes sense to you. Add a few starters or make your own; you can rename, reorder, or delete these anytime from Settings."
+                title={t('categories.title')}
+                description={t('categories.description')}
               >
                 <div className="flex flex-col gap-4 w-full">
                   <div className="flex flex-wrap gap-2">
-                    {STARTER_CATEGORIES.map((name) => {
+                    {STARTER_CATEGORY_KEYS.map((key) => {
+                      const name = t(key)
                       const added = categories.some(
                         (c) => c.name.toLowerCase() === name.toLowerCase(),
                       )
                       return (
                         <motion.button
-                          key={name}
+                          key={key}
                           whileHover={added ? undefined : { y: -1 }}
                           whileTap={added ? undefined : { scale: 0.96 }}
                           disabled={added || categoryBusy}
@@ -415,7 +417,7 @@ export function OnboardingView({ settings, onComplete }: Props) {
                       onKeyDown={(e) =>
                         e.key === 'Enter' && addCustomCategory()
                       }
-                      placeholder="Custom category name…"
+                      placeholder={t('categories.customPlaceholder')}
                       className="focus-ring flex-1 bg-raised border border-line rounded-lg px-3.5 py-2.5 text-sm focus:border-accent-dim transition-colors"
                     />
                     <motion.button
@@ -426,14 +428,14 @@ export function OnboardingView({ settings, onComplete }: Props) {
                       className="focus-ring cursor-pointer shrink-0 flex items-center gap-1.5 px-4 py-2.5 rounded-lg bg-accent hover:bg-accent-bright disabled:opacity-50 disabled:cursor-not-allowed text-sm font-medium text-white transition-colors"
                     >
                       <IconPlus className="w-3.5 h-3.5" />
-                      Add
+                      {t('categories.add')}
                     </motion.button>
                   </div>
 
                   {categories.length > 0 && (
                     <div className="flex flex-col gap-2">
                       <span className="text-[11px] font-medium text-muted uppercase tracking-wide">
-                        Your categories
+                        {t('categories.yourCategories')}
                       </span>
                       <div className="flex flex-col gap-1.5 max-h-40 overflow-y-auto">
                         {categories.map((c) => (
@@ -444,7 +446,7 @@ export function OnboardingView({ settings, onComplete }: Props) {
                             <span className="text-xs">{c.name}</span>
                             <button
                               onClick={() => removeCategory(c.id)}
-                              aria-label={`Remove ${c.name}`}
+                              aria-label={t('categories.removeAria', { name: c.name })}
                               className="icon-wiggle cursor-pointer text-muted opacity-0 group-hover:opacity-100 hover:text-danger transition-colors"
                             >
                               <IconTrash className="w-3.5 h-3.5" />
@@ -456,8 +458,7 @@ export function OnboardingView({ settings, onComplete }: Props) {
                   )}
 
                   <p className="text-[11px] text-muted leading-relaxed">
-                    Nothing here is required, projects with no category simply
-                    show up as Uncategorized.
+                    {t('categories.optionalNote')}
                   </p>
                 </div>
               </StepShell>
@@ -466,13 +467,13 @@ export function OnboardingView({ settings, onComplete }: Props) {
             {step.id === 'customize' && (
               <StepShell
                 icon={<IconArrowUpDown className="w-5 h-5" />}
-                title="Make it yours"
-                description="Pick an accent and background color to start. Corner roundness, density, text size, and light/dark mode are all in Settings whenever you want to fine-tune further."
+                title={t('customize.title')}
+                description={t('customize.description')}
               >
                 <div className="flex flex-col gap-7 w-full">
                   <div className="flex gap-8">
                     <ColorSwatchPicker
-                      label="Accent color"
+                      label={t('customize.accentColor')}
                       value={draft.accent_color}
                       presets={
                       draft.theme_mode === 'light'
@@ -489,7 +490,7 @@ export function OnboardingView({ settings, onComplete }: Props) {
                       }}
                     />
                     <ColorSwatchPicker
-                      label="Background color"
+                      label={t('customize.backgroundColor')}
                       value={draft.background_color}
                       presets={
                       draft.theme_mode === 'light'
@@ -510,7 +511,7 @@ export function OnboardingView({ settings, onComplete }: Props) {
                   <label className="flex flex-col gap-2.5">
                     <div className="flex items-center justify-between">
                       <span className="text-xs font-medium text-muted">
-                        Corner radius
+                        {t('customize.cornerRadius')}
                       </span>
                       <span className="text-xs font-mono text-ink bg-raised px-2 py-0.5 rounded-md">
                         {draft.corner_radius}px
@@ -521,7 +522,7 @@ export function OnboardingView({ settings, onComplete }: Props) {
                       max={20}
                       step={1}
                       value={draft.corner_radius}
-                      label="Corner radius"
+                      label={t('customize.cornerRadius')}
                       onChange={(v) => {
                         setField('corner_radius', v)
                         applyRadius(v)
@@ -535,27 +536,27 @@ export function OnboardingView({ settings, onComplete }: Props) {
             {step.id === 'finish' && (
               <StepShell
                 icon={<IconCheck className="w-5 h-5" />}
-                title="You're all set"
-                description="GodotHub is ready to go. You can revisit any of this, folders, categories, and appearance, from the Settings tab at any time."
+                title={t('finish.title')}
+                description={t('finish.description')}
               >
                 <div className="flex flex-col gap-2.5 w-full text-sm">
                   <div className="flex items-center justify-between px-4 py-3 rounded-lg bg-surface/60 border border-line">
-                    <span className="text-muted">Project folders</span>
+                    <span className="text-muted">{t('finish.projectFolders')}</span>
                     <span className="font-mono text-xs">
-                      {draft.project_scan_dirs.length || 'none'}
+                      {draft.project_scan_dirs.length || t('finish.none')}
                     </span>
                   </div>
                   <div className="flex items-center justify-between px-4 py-3 rounded-lg bg-surface/60 border border-line">
-                    <span className="text-muted">Version folders</span>
+                    <span className="text-muted">{t('finish.versionFolders')}</span>
                     <span className="font-mono text-xs">
-                      {draft.version_scan_dirs.length || 'none'}
+                      {draft.version_scan_dirs.length || t('finish.none')}
                     </span>
                   </div>
                   {settings.categories_enabled && (
                     <div className="flex items-center justify-between px-4 py-3 rounded-lg bg-surface/60 border border-line">
-                      <span className="text-muted">Categories</span>
+                      <span className="text-muted">{t('finish.categories')}</span>
                       <span className="font-mono text-xs">
-                        {categories.length || 'none'}
+                        {categories.length || t('finish.none')}
                       </span>
                     </div>
                   )}
@@ -571,7 +572,7 @@ export function OnboardingView({ settings, onComplete }: Props) {
             disabled={finishing}
             className="focus-ring cursor-pointer px-4 py-2.5 rounded-lg text-sm text-muted hover:text-ink hover:bg-raised transition-colors disabled:opacity-50"
           >
-            {stepIndex === 0 ? 'Skip setup' : 'Back'}
+            {stepIndex === 0 ? t('nav.skipSetup') : t('nav.back')}
           </button>
 
           {step.id === 'finish' ? (
@@ -582,7 +583,7 @@ export function OnboardingView({ settings, onComplete }: Props) {
               disabled={finishing}
               className="focus-ring cursor-pointer px-6 py-2.5 rounded-lg bg-accent hover:bg-accent-bright disabled:opacity-60 text-sm font-medium text-white transition-colors"
             >
-              {finishing ? 'Finishing…' : 'Get Started'}
+              {finishing ? t('nav.finishing') : t('nav.getStarted')}
             </motion.button>
           ) : (
             <motion.button
@@ -591,7 +592,7 @@ export function OnboardingView({ settings, onComplete }: Props) {
               onClick={goNext}
               className="focus-ring cursor-pointer px-6 py-2.5 rounded-lg bg-accent hover:bg-accent-bright text-sm font-medium text-white transition-colors"
             >
-              Continue
+              {t('nav.continue')}
             </motion.button>
           )}
         </div>

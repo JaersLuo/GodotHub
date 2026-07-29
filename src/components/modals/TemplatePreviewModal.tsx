@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react'
 import { motion } from 'framer-motion'
+import { useTranslation } from 'react-i18next'
 import { api } from '../../lib/api'
 import type { ProjectTemplate, TemplateFileEntry } from '../../types'
 import { IconCopy, IconInfo, IconX, IconChevronDown, IconChevronRight } from '../Icons'
@@ -124,6 +125,7 @@ interface Props {
 }
 
 export function TemplatePreviewModal({ template, onClose }: Props) {
+  const { t } = useTranslation()
   const [entries, setEntries] = useState<TemplateFileEntry[]>([])
   const [error, setError] = useState<string | null>(null)
   const [loading, setLoading] = useState(true)
@@ -174,8 +176,8 @@ export function TemplatePreviewModal({ template, onClose }: Props) {
               )}
               <div className="flex items-center gap-2 mt-1.5 text-[10px] text-muted/50 font-mono">
                 <IconInfo className="w-3 h-3" />
-                {fileCount} file{fileCount !== 1 ? 's' : ''}
-                {dirCount > 0 && ` · ${dirCount} folder${dirCount !== 1 ? 's' : ''}`}
+                {t('templatePreview.fileCount', { count: fileCount })}
+                {dirCount > 0 && ` · ${t('templatePreview.dirCount', { count: dirCount })}`}
                 {totalSize > 0 && ` · ${formatSize(totalSize)}`}
 
               </div>
@@ -184,7 +186,7 @@ export function TemplatePreviewModal({ template, onClose }: Props) {
           <button
             onClick={onClose}
             className="focus-ring cursor-pointer p-1.5 rounded-lg text-muted hover:text-ink hover:bg-raised transition-colors shrink-0"
-            aria-label="Close"
+            aria-label={t('common.close')}
           >
             <IconX className="w-4 h-4" />
           </button>
@@ -194,7 +196,7 @@ export function TemplatePreviewModal({ template, onClose }: Props) {
         <div className="flex-1 overflow-y-auto p-4">
           {loading ? (
             <div className="flex items-center justify-center py-12 text-sm text-muted">
-              Loading…
+              {t('common.loading')}
             </div>
           ) : error ? (
             <div className="flex items-center justify-center py-12 text-sm text-danger">
@@ -202,7 +204,7 @@ export function TemplatePreviewModal({ template, onClose }: Props) {
             </div>
           ) : entries.length === 0 ? (
             <div className="flex items-center justify-center py-12 text-sm text-muted">
-              This template is empty.
+              {t('templatePreview.emptyTemplate')}
             </div>
           ) : (
             <FileTree entries={entries} />

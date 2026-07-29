@@ -1,4 +1,5 @@
 import { useState } from 'react'
+import { useTranslation } from 'react-i18next'
 import { motion } from 'framer-motion'
 import { ColorSwatchPicker } from '../ui/ColorSwatchPicker'
 import {
@@ -13,6 +14,7 @@ interface Props {
 }
 
 export function CreateWorkspaceModal({ onClose, onCreate }: Props) {
+  const { t } = useTranslation()
   const [name, setName] = useState('')
   const [icon, setIcon] = useState<string>(WORKSPACE_ICON_KEYS[0])
   const [color, setColor] = useState(WORKSPACE_COLOR_PRESETS[0])
@@ -21,7 +23,7 @@ export function CreateWorkspaceModal({ onClose, onCreate }: Props) {
 
   const submit = async () => {
     if (!name.trim()) {
-      setError('Give the workspace a name.')
+      setError(t('createWorkspace:validationError'))
       return
     }
     setBusy(true)
@@ -51,27 +53,26 @@ export function CreateWorkspaceModal({ onClose, onCreate }: Props) {
         onClick={(e) => e.stopPropagation()}
       >
         <div>
-          <h3 className="font-display font-semibold text-lg">New Workspace</h3>
+          <h3 className="font-display font-semibold text-lg">{t('createWorkspace:title')}</h3>
           <p className="text-xs text-muted mt-1.5">
-            A separate profile with its own settings, projects, and categories.
-            Installed Godot versions are shared across every workspace.
+            {t('createWorkspace:description')}
           </p>
         </div>
 
         <div className="flex flex-col gap-2">
-          <label className="text-xs font-medium text-muted">Name</label>
+          <label className="text-xs font-medium text-muted">{t('createWorkspace:name')}</label>
           <input
             autoFocus
             value={name}
             onChange={(e) => setName(e.target.value)}
             onKeyDown={(e) => e.key === 'Enter' && submit()}
             className="focus-ring bg-raised border border-line rounded-lg px-3.5 py-2.5 text-sm focus:border-accent-dim transition-colors"
-            placeholder="Work, Personal, Game Jam…"
+            placeholder={t('createWorkspace:namePlaceholder')}
           />
         </div>
 
         <div className="flex flex-col gap-2.5">
-          <span className="text-xs font-medium text-muted">Icon</span>
+          <span className="text-xs font-medium text-muted">{t('createWorkspace:icon')}</span>
           <div className="flex flex-wrap gap-2">
             {WORKSPACE_ICON_KEYS.map((key) => {
               const Icon = getWorkspaceIcon(key)
@@ -98,7 +99,7 @@ export function CreateWorkspaceModal({ onClose, onCreate }: Props) {
         </div>
 
         <ColorSwatchPicker
-          label="Color"
+          label={t('createWorkspace:color')}
           value={color}
           onChange={setColor}
           presets={WORKSPACE_COLOR_PRESETS}
@@ -113,7 +114,7 @@ export function CreateWorkspaceModal({ onClose, onCreate }: Props) {
             onClick={onClose}
             className="focus-ring cursor-pointer px-4 py-2.5 rounded-lg text-sm text-muted hover:text-ink hover:bg-raised transition-colors"
           >
-            Cancel
+            {t('common:cancel')}
           </motion.button>
           <motion.button
             whileHover={busy ? undefined : { y: -1 }}
@@ -122,7 +123,7 @@ export function CreateWorkspaceModal({ onClose, onCreate }: Props) {
             disabled={busy}
             className="focus-ring px-4 cursor-pointer py-2.5 rounded-lg bg-accent hover:bg-accent-bright disabled:opacity-50 text-sm font-medium text-white transition-colors"
           >
-            {busy ? 'Creating…' : 'Create Workspace'}
+            {busy ? t('createWorkspace:creating') : t('createWorkspace:createWorkspace')}
           </motion.button>
         </div>
       </motion.div>

@@ -1,5 +1,6 @@
 import { useCallback, useEffect, useRef, useState } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
+import { useTranslation } from 'react-i18next'
 import { useSettings } from '../hooks/useSettings'
 import { DirList } from '../components/ui/DirList'
 import { Toggle } from '../components/ui/Toggle'
@@ -16,7 +17,7 @@ import {
   applyFontScale,
   applyReducedMotion,
 } from '../lib/appearance'
-import { SETTINGS_SEARCH_ITEMS } from '../components/modals/CommandPalette'
+import { buildSettingsSearchItems } from '../components/modals/CommandPalette'
 import { IconSearch, IconX, IconRefresh } from '../components/Icons'
 import type { AppSettings } from '../types'
 
@@ -143,12 +144,12 @@ function randomConstrainedHex(minSum: number, maxSum: number): string {
 type SettingsTab =
   'storage' | 'behavior' | 'display' | 'appearance' | 'advanced'
 
-const TABS: { id: SettingsTab; label: string }[] = [
-  { id: 'storage', label: 'Storage' },
-  { id: 'behavior', label: 'Behavior' },
-  { id: 'display', label: 'Display' },
-  { id: 'appearance', label: 'Appearance' },
-  { id: 'advanced', label: 'Advanced' },
+const TABS: { id: SettingsTab; labelKey: string }[] = [
+  { id: 'storage', labelKey: 'settings.tabs.storage' },
+  { id: 'behavior', labelKey: 'settings.tabs.behavior' },
+  { id: 'display', labelKey: 'settings.tabs.display' },
+  { id: 'appearance', labelKey: 'settings.tabs.appearance' },
+  { id: 'advanced', labelKey: 'settings.tabs.advanced' },
 ]
 
 function SectionCard({
@@ -184,6 +185,7 @@ function KeyRecorder({
   onChange: (key: string) => void
   onReset?: () => void
 }) {
+  const { t } = useTranslation()
   const [listening, setListening] = useState(false)
   const [confirmMsg, setConfirmMsg] = useState<string | null>(null)
   const confirmTimer = useRef<ReturnType<typeof setTimeout> | null>(null)
@@ -210,7 +212,7 @@ function KeyRecorder({
       onChangeRef.current(captured)
       setListening(false)
 
-      const label = captured === ' ' ? 'Space' : captured.toUpperCase()
+      const label = captured === ' ' ? t('settings.keyRecorder.space') : captured.toUpperCase()
       setConfirmMsg(`✓ ${mod}${label}`)
       if (confirmTimer.current) clearTimeout(confirmTimer.current)
       confirmTimer.current = setTimeout(() => setConfirmMsg(null), 1500)
@@ -218,7 +220,7 @@ function KeyRecorder({
 
     window.addEventListener('keydown', handler, true)
     return () => window.removeEventListener('keydown', handler, true)
-  }, [listening])
+  }, [listening, t, mod])
 
   useEffect(() => {
     return () => {
@@ -227,13 +229,13 @@ function KeyRecorder({
   }, [])
 
   const displayKey =
-    value === ' ' ? 'Space' : value ? value.toUpperCase() : '—'
+    value === ' ' ? t('settings.keyRecorder.space') : value ? value.toUpperCase() : '—'
 
   return (
     <label className="flex flex-col gap-2.5 pt-5 border-t border-line">
       <div className="flex items-center justify-between">
         <span className="text-xs font-medium text-muted block">
-          Command palette shortcut
+          {t('settings.keyRecorder.shortcutLabel')}
         </span>
         {value !== 'p' && onReset && (
           <button
@@ -246,15 +248,14 @@ function KeyRecorder({
             }}
             className="focus-ring cursor-pointer text-[10px] font-medium text-muted/60 hover:text-accent transition-colors"
           >
-            Reset to default
+            {t('settings.keyRecorder.resetToDefault')}
           </button>
         )}
       </div>
       <p className="text-[11px] text-muted mt-0.5 leading-relaxed">
-        Click the button below, then press any key to rebind.{' '}
-        Press{' '}
+        {t('settings.keyRecorder.instructions')}{' '}
         <kbd className="font-mono text-[10px] px-1 py-0.5 rounded bg-raised border border-line">Esc</kbd>
-        {' '}to cancel.
+        {' '}{t('settings.keyRecorder.toCancel')}
       </p>
       <div className="flex items-center gap-3">
         <button
@@ -270,14 +271,14 @@ function KeyRecorder({
           {listening ? (
             <>
               <span className="inline-block w-2 h-2 rounded-full bg-accent animate-pulse" />
-              <span>Press a key…</span>
+              <span>{t('settings.keyRecorder.pressAKey')}</span>
             </>
           ) : (
             <>
               <kbd className="text-xs px-2 py-0.5 rounded bg-surface border border-line/50">
                 {mod}{displayKey}
               </kbd>
-              <span className="text-xs font-normal text-muted">Click to rebind</span>
+              <span className="text-xs font-normal text-muted">{t('settings.keyRecorder.clickToRebind')}</span>
             </>
           )}
         </button>
@@ -302,6 +303,7 @@ function KeyRecorder({
 }
 
 function SaveStatus({ state }: { state: SaveState }) {
+  const { t } = useTranslation()
   return (
     <div className="h-4 flex items-center">
       <AnimatePresence mode="wait">
@@ -313,7 +315,7 @@ function SaveStatus({ state }: { state: SaveState }) {
             exit={{ opacity: 0 }}
             className="text-xs text-muted"
           >
-            Saving…
+            {t('settings.saveStatus.saving')}
           </motion.span>
         )}
         {state === 'saved' && (
@@ -324,7 +326,7 @@ function SaveStatus({ state }: { state: SaveState }) {
             exit={{ opacity: 0 }}
             className="text-xs text-accent"
           >
-            Saved
+            {t('settings.saveStatus.saved')}
           </motion.span>
         )}
       </AnimatePresence>
@@ -341,6 +343,7 @@ export function SettingsView({
   highlightSetting,
   onHighlightDone,
 }: SettingsViewProps = {}) {
+  const { t } = useTranslation()
   const { settings, update, resetToDefaults, loaded } = useSettings()
   const [current, setCurrent] = useState<AppSettings | null>(null)
   const [scanMessage, setScanMessage] = useState<string | null>(null)
@@ -517,10 +520,10 @@ export function SettingsView({
   }
 
   if (!loaded || !current)
-    return <div className="p-10 text-sm text-muted">Loading settings…</div>
+    return <div className="p-10 text-sm text-muted">{t('settings.loading')}</div>
 
   const runScan = async () => {
-    setScanMessage('Scanning…')
+    setScanMessage(t('settings.scanning'))
     const [projects, versions] = await Promise.all([
       current.project_scan_dirs.length
         ? api.scanForProjects(current.project_scan_dirs, current.scan_depth)
@@ -530,7 +533,10 @@ export function SettingsView({
         : Promise.resolve([]),
     ])
     setScanMessage(
-      `Found ${projects.length} new project${projects.length === 1 ? '' : 's'} and ${versions.length} new version${versions.length === 1 ? '' : 's'}.`,
+      t('settings.scanComplete', {
+        projects: projects.length,
+        versions: versions.length,
+      }),
     )
   }
 
@@ -603,10 +609,10 @@ export function SettingsView({
     <div className="p-10 pt-15 max-w-8xl mx-auto gap-6 flex flex-col">        <div className="flex items-start justify-between">
         <div>
           <h2 className="font-body font-semibold text-3xl tracking-tight">
-            SETTINGS
+            {t('settings.header.title')}
           </h2>
           <p className="text-xs text-muted">
-            Storage locations, auto-scan folders, and appearance.
+            {t('settings.header.description')}
           </p>
         </div>
         <SaveStatus state={saveState} />
@@ -626,7 +632,7 @@ export function SettingsView({
                 ;(e.target as HTMLInputElement).blur()
               }
             }}
-            placeholder="Search settings…"
+            placeholder={t('settings.search.placeholder')}
             className="focus-ring w-full bg-raised border border-line rounded-xl pl-10 pr-4 py-3 text-sm focus:border-accent-dim transition-colors"
           />
           {settingsSearchQuery && (
@@ -648,7 +654,7 @@ export function SettingsView({
           >
             {(() => {
               const q = settingsSearchQuery.trim().toLowerCase()
-              const matches = SETTINGS_SEARCH_ITEMS.filter(
+              const matches = buildSettingsSearchItems(t).filter(
                 (item) =>
                   item.label.toLowerCase().includes(q) ||
                   item.key.toLowerCase().includes(q),
@@ -657,8 +663,7 @@ export function SettingsView({
                 return (
                   <div className="px-4 py-6 text-center">
                     <p className="text-xs text-muted">
-                      No settings match{' '}
-                      <span className="font-mono text-ink">"{settingsSearchQuery}"</span>
+                      {t('settings.search.noMatch', { query: settingsSearchQuery })}
                     </p>
                   </div>
                 )
@@ -693,7 +698,7 @@ export function SettingsView({
 
       {/* Tab bar */}
       <div className="inline-flex self-start rounded-lg border border-line bg-raised p-1 gap-1">
-        {TABS.map(({ id, label }) => (
+        {TABS.map(({ id, labelKey }) => (
           <motion.button
             key={id}
             whileTap={{ scale: 0.96 }}
@@ -705,7 +710,7 @@ export function SettingsView({
                 : 'text-muted hover:text-ink hover:bg-overlay/60')
             }
           >
-            {label}
+            {t(labelKey)}
           </motion.button>
         ))}
       </div>
@@ -721,55 +726,52 @@ export function SettingsView({
           >
             <div data-section-id="storage-folders">
             <SectionCard
-              title="Storage & Auto-scan"
-              description="Folders GodotHub checks at startup. Star a folder to also use it as the default location for new projects/downloads."
+              title={t('settings.storage.title')}
+              description={t('settings.storage.description')}
             >
               <div className="flex flex-col gap-6">
                 <div className="flex flex-col gap-2.5">
                   <span className="text-xs font-medium text-muted">
-                    Projects
+                    {t('settings.storage.projects')}
                   </span>
                   <DirList
                     dirs={current.project_scan_dirs}
                     onChange={(dirs) => setField('project_scan_dirs', dirs)}
-                    emptyHint="No folders added, nothing will be scanned at startup, and new projects will ask where to save each time."
+                    emptyHint={t('settings.storage.projectsEmptyHint')}
                     defaultDir={current.default_project_location}
                     onSetDefault={(dir) =>
                       setField('default_project_location', dir)
                     }
-                    defaultLabel="New project default"
+                    defaultLabel={t('settings.storage.newProjectDefault')}
                     showFallbackDescription={false}
                   />
                   <p className="text-[11px] text-muted leading-relaxed">
-                    Scanned at startup for existing projects. The starred folder
-                    pre-fills the "Location" field in the New Project dialog.
+                    {t('settings.storage.projectsNote')}
                   </p>
                 </div>
 
                 <div className="flex flex-col gap-2.5 pt-5 border-t border-line">
                   <span className="text-xs font-medium text-muted">
-                    Godot versions
+                    {t('settings.storage.godotVersions')}
                   </span>
                   <DirList
                     dirs={current.version_scan_dirs}
                     onChange={(dirs) => setField('version_scan_dirs', dirs)}
-                    emptyHint="No folders added, nothing will be scanned at startup, and new downloads will use the app data folder."
+                    emptyHint={t('settings.storage.versionsEmptyHint')}
                     defaultDir={current.download_dir}
                     onSetDefault={(dir) => setField('download_dir', dir)}
-                    defaultLabel="Download folder"
+                    defaultLabel={t('settings.storage.downloadFolder')}
                     showFallbackDescription={true}
                     fallbackDownloadPath="AppData\\Roaming\\com.ryko.godothub\\godot-versions\\"
                   />
                   <p className="text-[11px] text-muted leading-relaxed">
-                    Scanned at startup for installed Godot executables. The
-                    starred folder is where new Godot versions are extracted
-                    when you install them.
+                    {t('settings.storage.versionsNote')}
                   </p>
                 </div>
 
                 <div className="flex flex-col gap-2.5 pt-5 border-t border-line">
                   <span className="text-xs font-medium text-muted">
-                    Templates
+                    {t('settings.storage.templates')}
                   </span>
                   <div className="flex items-center gap-2.5">
                     {current.template_scan_dir ? (
@@ -785,12 +787,12 @@ export function SettingsView({
                           onClick={() => setField('template_scan_dir', null)}
                           className="focus-ring cursor-pointer px-3 py-2 rounded-lg border border-line text-xs text-muted hover:text-danger hover:border-danger/30 hover:bg-danger/10 transition-colors"
                         >
-                          Clear
+                          {t('settings.storage.clear')}
                         </motion.button>
                       </>
                     ) : (
                       <span className="text-xs text-muted">
-                        No folder set. You can still import manually or use 'Save as Template'.
+                        {t('settings.storage.templatesNote')}
                       </span>
                     )}
                     <motion.button
@@ -802,24 +804,21 @@ export function SettingsView({
                       }}
                       className="focus-ring cursor-pointer px-3.5 py-2 rounded-lg border border-line text-xs hover:border-accent-dim hover:bg-raised transition-colors"
                     >
-                      Browse
+                      {t('settings.storage.browse')}
                     </motion.button>
                   </div>
                   <p className="text-[11px] text-muted leading-relaxed">
-                    Any subfolders inside this directory will be imported as
-                    templates when you click 'Import from Directory' in the
-                    Templates view.
+                    {t('settings.storage.templatesImportNote')}
                   </p>
                 </div>
 
                 <div className="flex flex-col gap-2.5 pt-5 border-t border-line">
                   <div className="flex items-center justify-between gap-4">
                     <span className="text-xs font-medium text-muted">
-                      Scan depth
+                      {t('settings.storage.scanDepth')}
                     </span>
                     <span className="text-xs text-ink tabular-nums">
-                      {current.scan_depth} folder
-                      {current.scan_depth === 1 ? '' : 's'} deep
+                      {t('settings.storage.scanDepthValue', { count: current.scan_depth })}
                     </span>
                   </div>
                   <Slider
@@ -827,23 +826,20 @@ export function SettingsView({
                     min={1}
                     max={10}
                     onChange={(value) => setField('scan_depth', value)}
-                    label="Scan depth"
+                    label={t('settings.storage.scanDepth')}
                   />
                   <p className="text-[11px] text-muted leading-relaxed">
-                    How many folders deep to look inside each scan folder above.
-                    Lower is faster and avoids picking up unrelated
-                    projects/versions buried in nested subfolders; higher digs
-                    further if yours are deeply nested.
+                    {t('settings.storage.scanDepthNote')}
                   </p>
                 </div>
 
                 <div className="flex flex-col gap-2.5 pt-5 border-t border-line">
                   <div className="flex items-center justify-between gap-4">
                     <span className="text-xs font-medium text-muted">
-                      Simultaneous downloads
+                      {t('settings.storage.simultaneousDownloads')}
                     </span>
                     <span className="text-xs text-ink tabular-nums">
-                      {current.download_concurrency} at once
+                      {t('settings.storage.simultaneousDownloadsValue', { count: current.download_concurrency })}
                     </span>
                   </div>
                   <Slider
@@ -853,12 +849,10 @@ export function SettingsView({
                     onChange={(value) =>
                       setField('download_concurrency', value)
                     }
-                    label="Simultaneous downloads"
+                    label={t('settings.storage.simultaneousDownloads')}
                   />
                   <p className="text-[11px] text-muted leading-relaxed">
-                    How many Godot versions can download at the same time. Extra
-                    downloads wait in a queue and start automatically as slots
-                    free up.
+                    {t('settings.storage.simultaneousDownloadsNote')}
                   </p>
                 </div>
 
@@ -869,7 +863,7 @@ export function SettingsView({
                     onClick={runScan}
                     className="focus-ring cursor-pointer px-5 py-2.5 rounded-lg border border-line hover:border-accent-dim hover:bg-raised text-sm font-medium transition-colors"
                   >
-                    Scan Now
+                    {t('settings.storage.scanNow')}
                   </motion.button>
                   {scanMessage && (
                     <span className="text-xs text-muted">{scanMessage}</span>
@@ -892,19 +886,19 @@ export function SettingsView({
           >
             <div data-section-id="behavior">
             <SectionCard
-              title="Behavior"
-              description="How GodotHub acts when you launch a project."
+              title={t('settings.behavior.title')}
+              description={t('settings.behavior.description')}
             >
               <div className="flex flex-col gap-5">
                 <label className="flex items-center justify-between gap-4">
                   <div>
                     <span className="text-xs font-medium text-muted block">
-                      Close application on project open
+                      {t('settings.behavior.closeOnProjectOpen')}
                     </span>
                     <p className="text-[11px] text-muted mt-1 leading-relaxed">
                       {isMac
-                        ? 'Hides GodotHub automatically as soon as a project is launched in Godot. It keeps running in the Dock.'
-                        : 'Quits GodotHub automatically as soon as a project is launched in Godot.'}
+                        ? t('settings.behavior.closeOnProjectOpenNoteMac')
+                        : t('settings.behavior.closeOnProjectOpenNote')}
                     </p>
                   </div>
                   <Toggle
@@ -912,7 +906,7 @@ export function SettingsView({
                     onChange={(checked) =>
                       setField('close_on_project_open', checked)
                     }
-                    label="Close application on project open"
+                    label={t('settings.behavior.closeOnProjectOpen')}
                   />
                 </label>
 
@@ -920,12 +914,10 @@ export function SettingsView({
                   <label className="flex items-center justify-between gap-4 pt-5 border-t border-line">
                     <div>
                       <span className="text-xs font-medium text-muted block">
-                        Minimize to system tray on closing app
+                        {t('settings.behavior.minimizeToTray')}
                       </span>
                       <p className="text-[11px] text-muted mt-1 leading-relaxed">
-                        Keeps GodotHub running in the system tray instead of
-                        quitting when you close the window. Use the tray icon to
-                        reopen or quit.
+                        {t('settings.behavior.minimizeToTrayNote')}
                       </p>
                     </div>
                     <Toggle
@@ -933,7 +925,7 @@ export function SettingsView({
                       onChange={(checked) =>
                         setField('minimize_to_tray', checked)
                       }
-                      label="Minimize to system tray on closing app"
+                      label={t('settings.behavior.minimizeToTray')}
                     />
                   </label>
                 )}
@@ -950,12 +942,12 @@ export function SettingsView({
                       >
                         <div>
                           <span className="text-xs font-medium text-muted block">
-                            Reopen after closing Godot
+                            {t('settings.behavior.reopenAfterGodotCloses')}
                           </span>
                           <p className="text-[11px] text-muted mt-1 leading-relaxed">
                             {isMac
-                              ? 'Brings GodotHub back automatically once the Godot editor for that project is closed.'
-                              : 'Brings GodotHub back out of the system tray automatically once the Godot editor for that project is closed.'}
+                              ? t('settings.behavior.reopenAfterGodotClosesNoteMac')
+                              : t('settings.behavior.reopenAfterGodotClosesNote')}
                           </p>
                         </div>
                         <Toggle
@@ -963,7 +955,7 @@ export function SettingsView({
                           onChange={(checked) =>
                             setField('reopen_after_godot_closes', checked)
                           }
-                          label="Reopen after closing Godot"
+                          label={t('settings.behavior.reopenAfterGodotCloses')}
                         />
                       </motion.label>
                     )}
@@ -972,10 +964,10 @@ export function SettingsView({
                 <label className="flex flex-col gap-2.5 pt-5 border-t border-line">
                   <div className="flex items-center justify-between">
                     <span className="text-xs font-medium text-muted">
-                      Tray recent projects
+                      {t('settings.behavior.trayRecentProjects')}
                     </span>
                     <span className="text-xs text-ink tabular-nums">
-                      {current.tray_recent_projects_count} project{current.tray_recent_projects_count === 1 ? '' : 's'}
+                      {t('settings.behavior.trayRecentProjectsValue', { count: current.tray_recent_projects_count })}
                     </span>
                   </div>
                   <Slider
@@ -986,11 +978,10 @@ export function SettingsView({
                       setField('tray_recent_projects_count', value)
                       api.refreshTrayMenu().catch(() => {})
                     }}
-                    label="Tray recent projects"
+                    label={t('settings.behavior.trayRecentProjects')}
                   />
                   <p className="text-[11px] text-muted leading-relaxed">
-                    How many recently opened projects appear in the system tray
-                    context menu. Set between 1 and 10.
+                    {t('settings.behavior.trayRecentProjectsNote')}
                   </p>
                 </label>
 
@@ -1005,20 +996,17 @@ export function SettingsView({
 
             <div data-section-id="behavior-projects">
             <SectionCard
-              title="Projects"
-              description="How projects are organized in GodotHub."
+              title={t('settings.behavior.projectsTitle')}
+              description={t('settings.behavior.projectsDescription')}
             >
               <div className="flex flex-col gap-5">
                 <label className="flex items-center justify-between gap-4">
                   <div>
                     <span className="text-xs font-medium text-muted block">
-                      Auto-scan on startup
+                      {t('settings.behavior.autoScanOnStartup')}
                     </span>
                     <p className="text-[11px] text-muted mt-1 leading-relaxed">
-                      Automatically scans your configured project and version
-                      folders for new additions every time GodotHub starts. You
-                      can still scan manually anytime from the Projects and
-                      Versions views.
+                      {t('settings.behavior.autoScanOnStartupNote')}
                     </p>
                   </div>
                   <Toggle
@@ -1026,20 +1014,17 @@ export function SettingsView({
                     onChange={(checked) =>
                       setField('auto_scan_on_startup', checked)
                     }
-                    label="Auto-scan on startup"
+                    label={t('settings.behavior.autoScanOnStartup')}
                   />
                 </label>
 
                 <label className="flex items-center justify-between gap-4 pt-5 border-t border-line">
                   <div>
                     <span className="text-xs font-medium text-muted block">
-                      Use categories
+                      {t('settings.behavior.useCategories')}
                     </span>
                     <p className="text-[11px] text-muted mt-1 leading-relaxed">
-                      Turns off categories entirely, no Categories button, no
-                      category filter, no Uncategorized bucket. Projects shows
-                      one plain list. Existing category assignments are kept and
-                      come back if you turn this on again.
+                      {t('settings.behavior.useCategoriesNote')}
                     </p>
                   </div>
                   <Toggle
@@ -1047,21 +1032,17 @@ export function SettingsView({
                     onChange={(checked) =>
                       setField('categories_enabled', checked)
                     }
-                    label="Use categories"
+                    label={t('settings.behavior.useCategories')}
                   />
                 </label>
 
                 <label className="flex items-center justify-between gap-4 pt-5 border-t border-line">
                   <div>
                     <span className="text-xs font-medium text-muted block">
-                      Use workspaces
+                      {t('settings.behavior.useWorkspaces')}
                     </span>
                     <p className="text-[11px] text-muted mt-1 leading-relaxed">
-                      Turns off workspaces entirely, no workspace switcher, no
-                      "add workspace" button. GodotHub behaves as if there were
-                      only the one currently-active workspace. Existing
-                      workspaces are kept and the switcher comes back if you
-                      turn this on again.
+                      {t('settings.behavior.useWorkspacesNote')}
                     </p>
                   </div>
                   <Toggle
@@ -1069,14 +1050,14 @@ export function SettingsView({
                     onChange={(checked) =>
                       setField('workspaces_enabled', checked)
                     }
-                    label="Use workspaces"
+                    label={t('settings.behavior.useWorkspaces')}
                   />
                 </label>
 
                 <label className="flex flex-col gap-2.5 pt-5 border-t border-line">
                   <div className="flex items-center justify-between">
                     <span className="text-xs font-medium text-muted">
-                      Tooltip delay
+                      {t('settings.behavior.tooltipDelay')}
                     </span>
                     <span className="text-xs text-ink tabular-nums">
                       {current.tooltip_delay}ms
@@ -1090,12 +1071,10 @@ export function SettingsView({
                     onChange={(value) =>
                       setField('tooltip_delay', value)
                     }
-                    label="Tooltip delay"
+                    label={t('settings.behavior.tooltipDelay')}
                   />
                   <p className="text-[11px] text-muted leading-relaxed">
-                    How long to wait before showing tooltips when hovering over
-                    buttons, icons, and sidebar items. Lower values feel more
-                    responsive; higher values reduce distraction.
+                    {t('settings.behavior.tooltipDelayNote')}
                   </p>
                 </label>
 
@@ -1105,20 +1084,17 @@ export function SettingsView({
 
             <div data-section-id="behavior-watchers">
             <SectionCard
-              title="File Watchers"
-              description="Automatically detect changes in your scan folders and keep projects, versions, and templates up to date without clicking Sync."
+              title={t('settings.behavior.watchersTitle')}
+              description={t('settings.behavior.watchersDescription')}
             >
               <div className="flex flex-col gap-5">
                 <label className="flex items-center justify-between gap-4">
                   <div>
                     <span className="text-xs font-medium text-muted block">
-                      Watch project folders
+                      {t('settings.behavior.watchProjectFolders')}
                     </span>
                     <p className="text-[11px] text-muted mt-1 leading-relaxed">
-                      Automatically scans for new or removed projects whenever
-                      files change inside your configured project scan folders.
-                      New project folders are added to your library; removed
-                      ones are left in place but unregistered.
+                      {t('settings.behavior.watchProjectFoldersNote')}
                     </p>
                   </div>
                   <Toggle
@@ -1126,20 +1102,17 @@ export function SettingsView({
                     onChange={(checked) =>
                       setField('auto_watch_project_dirs', checked)
                     }
-                    label="Watch project folders"
+                    label={t('settings.behavior.watchProjectFolders')}
                   />
                 </label>
 
                 <label className="flex items-center justify-between gap-4 pt-5 border-t border-line">
                   <div>
                     <span className="text-xs font-medium text-muted block">
-                      Watch version folders
+                      {t('settings.behavior.watchVersionFolders')}
                     </span>
                     <p className="text-[11px] text-muted mt-1 leading-relaxed">
-                      Automatically scans for new or removed Godot executables
-                      whenever files change inside your configured version scan
-                      folders. New executables are added to your installed
-                      versions list.
+                      {t('settings.behavior.watchVersionFoldersNote')}
                     </p>
                   </div>
                   <Toggle
@@ -1147,19 +1120,17 @@ export function SettingsView({
                     onChange={(checked) =>
                       setField('auto_watch_version_dirs', checked)
                     }
-                    label="Watch version folders"
+                    label={t('settings.behavior.watchVersionFolders')}
                   />
                 </label>
 
                 <label className="flex items-center justify-between gap-4 pt-5 border-t border-line">
                   <div>
                     <span className="text-xs font-medium text-muted block">
-                      Watch template directory
+                      {t('settings.behavior.watchTemplateDirectory')}
                     </span>
                     <p className="text-[11px] text-muted mt-1 leading-relaxed">
-                      Automatically syncs templates whenever files change inside
-                      your template scan directory. Edit a template folder and
-                      the template content updates automatically.
+                      {t('settings.behavior.watchTemplateDirectoryNote')}
                     </p>
                   </div>
                   <Toggle
@@ -1167,13 +1138,12 @@ export function SettingsView({
                     onChange={(checked) =>
                       setField('auto_watch_template_dir', checked)
                     }
-                    label="Watch template directory"
+                    label={t('settings.behavior.watchTemplateDirectory')}
                   />
                 </label>
 
                 <p className="text-[10px] text-muted/50 mt-1 leading-relaxed">
-                  Watchers use debounced file system events. Changes are detected within a
-                  few seconds of the last file save. Disabling a watcher frees system resources.
+                  {t('settings.behavior.watchersNote')}
                 </p>
               </div>
             </SectionCard>
@@ -1191,21 +1161,19 @@ export function SettingsView({
           >
             <div data-section-id="display">
             <SectionCard
-              title="Last Opened Display"
-              description={
-                'Controls the "last opened" pill shown on project cards. Hidden entirely for projects that have never been opened.'
-              }
+              title={t('settings.display.title')}
+              description={t('settings.display.description')}
             >
               <div className="flex flex-col gap-6">
                 <div className="flex flex-col gap-2.5">
                   <span className="text-xs font-medium text-muted">
-                    Time format (shown when opened today)
+                    {t('settings.display.timeFormatLabel')}
                   </span>
                   <div className="inline-flex self-start rounded-lg border border-line bg-raised p-1 gap-1">
                     {[
-                      { value: '12h' as const, label: '12-hour (2:30 PM)' },
-                      { value: '24h' as const, label: '24-hour (14:30)' },
-                    ].map(({ value, label }) => {
+                      { value: '12h' as const, labelKey: 'settings.display.timeFormat12h' },
+                      { value: '24h' as const, labelKey: 'settings.display.timeFormat24h' },
+                    ].map(({ value, labelKey }) => {
                       const active = current.last_opened_time_format === value
                       return (
                         <motion.button
@@ -1221,7 +1189,7 @@ export function SettingsView({
                               : 'text-muted hover:text-ink hover:bg-overlay/60')
                           }
                         >
-                          {label}
+                          {t(labelKey)}
                         </motion.button>
                       )
                     })}
@@ -1230,7 +1198,7 @@ export function SettingsView({
 
                 <div className="flex flex-col gap-2.5">
                   <span className="text-xs font-medium text-muted">
-                    Date format (shown for any other day)
+                    {t('settings.display.dateFormatLabel')}
                   </span>
                   <div className="inline-flex self-start rounded-lg border border-line bg-raised p-1 gap-1">
                     {[
@@ -1275,19 +1243,19 @@ export function SettingsView({
           >
             <div data-section-id="appearance">
             <SectionCard
-              title="Appearance"
-              description="Changes apply instantly across the whole app."
+              title={t('settings.appearance.title')}
+              description={t('settings.appearance.description')}
             >
               <div className="flex flex-col gap-7">
                 <div className="flex flex-col gap-2.5">
-                  <span className="text-xs font-medium text-muted">Theme</span>
+                  <span className="text-xs font-medium text-muted">{t('settings.appearance.theme')}</span>
                   <div className="flex items-center gap-3 flex-wrap">
                     {/* Dark / Light */}
                     <div className="inline-flex self-start rounded-lg border border-line bg-raised p-1 gap-1">
                       {[
-                        { mode: 'dark' as const, label: 'Dark', Icon: IconMoon },
-                        { mode: 'light' as const, label: 'Light', Icon: IconSun },
-                      ].map(({ mode, label, Icon }) => {
+                        { mode: 'dark' as const, labelKey: 'settings.appearance.dark', Icon: IconMoon },
+                        { mode: 'light' as const, labelKey: 'settings.appearance.light', Icon: IconSun },
+                      ].map(({ mode, labelKey, Icon }) => {
                         const active = current.theme_mode === mode
                         return (
                           <motion.button
@@ -1302,7 +1270,7 @@ export function SettingsView({
                             }
                           >
                             <Icon className="w-3.5 h-3.5" />
-                            {label}
+                            {t(labelKey)}
                           </motion.button>
                         )
                       })}
@@ -1314,21 +1282,21 @@ export function SettingsView({
                         whileHover={{ y: -1 }}
                         whileTap={{ scale: 0.96 }}
                         onClick={feelingLucky}
-                        aria-label="I'm feeling lucky"
+                        aria-label={t('settings.appearance.luckyAriaLabel')}
                         className="focus-ring cursor-pointer flex items-center gap-1.5 px-3 py-1.5 rounded-md text-xs font-medium text-muted hover:text-accent-bright hover:bg-overlay/60 transition-colors"
                       >
                         <IconRocket className="w-3.5 h-3.5" />
-                        Lucky
+                        {t('settings.appearance.lucky')}
                       </motion.button>
                       <motion.button
                         whileHover={{ y: -1 }}
                         whileTap={{ scale: 0.96 }}
                         onClick={resetThemeColors}
-                        aria-label="Reset colors to default"
+                        aria-label={t('settings.appearance.resetColorsAriaLabel')}
                         className="focus-ring cursor-pointer flex items-center gap-1.5 px-3 py-1.5 rounded-md text-xs font-medium text-muted hover:text-ink hover:bg-overlay/60 transition-colors"
                       >
                         <IconHeart className="w-3.5 h-3.5" />
-                        Reset
+                        {t('settings.appearance.reset')}
                       </motion.button>
                     </div>
                   </div>
@@ -1336,7 +1304,7 @@ export function SettingsView({
 
                 <div className="flex gap-8">
                   <ColorSwatchPicker
-                    label="Accent color"
+                    label={t('settings.appearance.accentColor')}
                     value={current.accent_color}
                     presets={
                       current.theme_mode === 'light'
@@ -1349,7 +1317,7 @@ export function SettingsView({
                     }}
                   />
                   <ColorSwatchPicker
-                    label="Background color"
+                    label={t('settings.appearance.backgroundColor')}
                     value={current.background_color}
                     presets={
                       current.theme_mode === 'light'
@@ -1363,15 +1331,13 @@ export function SettingsView({
                   />
                 </div>
                 <p className="-mt-4 text-[11px] text-muted leading-relaxed">
-                  Background color applies across all themes. In light mode
-                  the app derives card surfaces, borders, and overlays from your
-                  chosen background. In dark mode the background sets the base page color.
+                  {t('settings.appearance.backgroundColorNote')}
                 </p>
 
                 <label className="flex flex-col gap-2.5">
                   <div className="flex items-center justify-between">
                     <span className="text-xs font-medium text-muted">
-                      Corner radius
+                      {t('settings.appearance.cornerRadius')}
                     </span>
                     <span className="text-xs font-mono text-ink bg-raised px-2 py-0.5 rounded-md">
                       {current.corner_radius}px
@@ -1382,22 +1348,21 @@ export function SettingsView({
                     max={20}
                     step={1}
                     value={current.corner_radius}
-                    label="Corner radius"
+                    label={t('settings.appearance.cornerRadius')}
                     onChange={(v) => {
                       setField('corner_radius', v)
                       applyRadius(v)
                     }}
                   />
                   <p className="text-[11px] text-muted leading-relaxed">
-                    Controls every rounded corner in the app, cards, buttons,
-                    inputs, and dropdowns. 0 for sharp, square corners.
+                    {t('settings.appearance.cornerRadiusNote')}
                   </p>
                 </label>
 
                 <label className="flex flex-col gap-2.5">
                   <div className="flex items-center justify-between">
                     <span className="text-xs font-medium text-muted">
-                      UI density
+                      {t('settings.appearance.uiDensity')}
                     </span>
                     <span className="text-xs font-mono text-ink bg-raised px-2 py-0.5 rounded-md">
                       {Math.round(current.ui_density * 100)}%
@@ -1408,22 +1373,21 @@ export function SettingsView({
                     max={1.25}
                     step={0.05}
                     value={current.ui_density}
-                    label="UI density"
+                    label={t('settings.appearance.uiDensity')}
                     onChange={(v) => {
                       setField('ui_density', v)
                       applyDensity(v)
                     }}
                   />
                   <p className="text-[11px] text-muted leading-relaxed">
-                    Scales padding, margins, and spacing everywhere, lower for a
-                    tighter, compact layout.
+                    {t('settings.appearance.uiDensityNote')}
                   </p>
                 </label>
 
                 <label className="flex flex-col gap-2.5">
                   <div className="flex items-center justify-between">
                     <span className="text-xs font-medium text-muted">
-                      Text size
+                      {t('settings.appearance.textSize')}
                     </span>
                     <span className="text-xs font-mono text-ink bg-raised px-2 py-0.5 rounded-md">
                       {Math.round(current.font_scale * 100)}%
@@ -1434,25 +1398,24 @@ export function SettingsView({
                     max={1.3}
                     step={0.05}
                     value={current.font_scale}
-                    label="Text size"
+                    label={t('settings.appearance.textSize')}
                     onChange={(v) => {
                       setField('font_scale', v)
                       applyFontScale(v)
                     }}
                   />
                   <p className="text-[11px] text-muted leading-relaxed">
-                    Scales all text (and anything sized relative to it) across
-                    the app.
+                    {t('settings.appearance.textSizeNote')}
                   </p>
                 </label>
 
                 <label className="flex items-center justify-between gap-4">
                   <div>
                     <span className="text-xs font-medium text-muted block">
-                      Reduce motion
+                      {t('settings.appearance.reduceMotion')}
                     </span>
                     <p className="text-[11px] text-muted mt-1 leading-relaxed">
-                      Minimizes hover and UI transition animations.
+                      {t('settings.appearance.reduceMotionNote')}
                     </p>
                   </div>
                   <Toggle
@@ -1461,7 +1424,7 @@ export function SettingsView({
                       setField('reduce_motion', checked)
                       applyReducedMotion(checked)
                     }}
-                    label="Reduce motion"
+                    label={t('settings.appearance.reduceMotion')}
                   />
                 </label>
 
@@ -1469,7 +1432,7 @@ export function SettingsView({
                   <div className="flex flex-col gap-2.5">
                     <div className="flex items-center justify-between gap-4">
                       <span className="text-xs font-medium text-muted">
-                        Sidebar width (expanded)
+                        {t('settings.appearance.sidebarWidthExpanded')}
                       </span>
                       <span className="text-xs font-mono text-ink bg-raised px-2 py-0.5 rounded-md">
                         {sidebarExpandedWidth}px
@@ -1480,7 +1443,7 @@ export function SettingsView({
                       min={160}
                       max={400}
                       step={10}
-                      label="Sidebar width (expanded)"
+                      label={t('settings.appearance.sidebarWidthExpanded')}
                       onChange={(v) => {
                         setSidebarExpandedWidth(v)
                         try {
@@ -1498,7 +1461,7 @@ export function SettingsView({
                   <div className="flex flex-col gap-2.5">
                     <div className="flex items-center justify-between gap-4">
                       <span className="text-xs font-medium text-muted">
-                        Sidebar width (collapsed)
+                        {t('settings.appearance.sidebarWidthCollapsed')}
                       </span>
                       <span className="text-xs font-mono text-ink bg-raised px-2 py-0.5 rounded-md">
                         {sidebarCollapsedWidth}px
@@ -1509,7 +1472,7 @@ export function SettingsView({
                       min={50}
                       max={120}
                       step={2}
-                      label="Sidebar width (collapsed)"
+                      label={t('settings.appearance.sidebarWidthCollapsed')}
                       onChange={(v) => {
                         setSidebarCollapsedWidth(v)
                         try {
@@ -1532,7 +1495,7 @@ export function SettingsView({
                   onClick={resetAppearance}
                   className="focus-ring cursor-pointer self-start px-4 py-2 rounded-lg border border-line text-muted hover:text-ink hover:bg-raised text-sm transition-colors"
                 >
-                  Reset appearance to default
+                  {t('settings.appearance.resetToDefault')}
                 </motion.button>
               </div>
             </SectionCard>
@@ -1553,13 +1516,10 @@ export function SettingsView({
             <div className="rounded-xl border border-line bg-surface/60 p-6 flex items-center justify-between gap-6">
               <div className="min-w-0">
                 <h3 className="font-display font-semibold">
-                  Run Setup Wizard Again
+                  {t('settings.advanced.setupWizardTitle')}
                 </h3>
                 <p className="text-xs text-muted mt-1.5 leading-relaxed">
-                  Reopens the first-time setup flow where you can reconfigure
-                  scan folders, categories, accent color, and corner radius.
-                  Settings already saved will be kept, you can always skip steps
-                  you don&apos;t need to change.
+                  {t('settings.advanced.setupWizardNote')}
                 </p>
               </div>
               <motion.button
@@ -1568,7 +1528,7 @@ export function SettingsView({
                 onClick={() => setFields({ setup_complete: false })}
                 className="focus-ring cursor-pointer shrink-0 px-5 py-2.5 rounded-lg border border-line hover:border-accent-dim hover:bg-raised text-sm font-medium transition-colors"
               >
-                Open Setup
+                {t('settings.advanced.openSetup')}
               </motion.button>
             </div>
             </div>
@@ -1577,13 +1537,10 @@ export function SettingsView({
             <div className="rounded-xl border border-line bg-surface/60 p-6 flex items-center justify-between gap-6">
               <div className="min-w-0">
                 <h3 className="font-display font-semibold">
-                  Reset Settings to Default
+                  {t('settings.advanced.resetSettingsTitle')}
                 </h3>
                 <p className="text-xs text-muted mt-1.5 leading-relaxed">
-                  Restores every setting on this page; download folder, scan
-                  folders, appearance and behavior back to their original
-                  defaults. Scan folders and download locations are kept; only
-                  toggles, sliders, and color picks are reset.
+                  {t('settings.advanced.resetSettingsNote')}
                 </p>
               </div>
               <motion.button
@@ -1592,7 +1549,7 @@ export function SettingsView({
                 onClick={() => setConfirmingReset(true)}
                 className="focus-ring cursor-pointer shrink-0 px-5 py-2.5 rounded-lg border border-line text-muted hover:text-danger hover:border-danger/40 hover:bg-danger/5 text-sm font-medium transition-colors"
               >
-                Reset
+                {t('settings.advanced.reset')}
               </motion.button>
             </div>
             </div>
@@ -1601,12 +1558,10 @@ export function SettingsView({
             <div className="rounded-xl border border-line bg-surface/60 p-6 flex items-center justify-between gap-6">
               <div className="min-w-0">
                 <h3 className="font-display font-semibold">
-                  Export / Import Settings
+                  {t('settings.advanced.exportImportTitle')}
                 </h3>
                 <p className="text-xs text-muted mt-1.5 leading-relaxed">
-                  Save your current settings as a JSON file to back them up or
-                  transfer them to another machine. Importing replaces all
-                  current settings with those from the file.
+                  {t('settings.advanced.exportImportNote')}
                 </p>
               </div>
               <div className="flex gap-2.5 shrink-0">
@@ -1631,7 +1586,7 @@ export function SettingsView({
                   }}
                   className="focus-ring cursor-pointer px-4 py-2.5 rounded-lg border border-line hover:border-accent-dim hover:bg-raised text-sm font-medium transition-colors"
                 >
-                  Export
+                  {t('settings.advanced.export')}
                 </motion.button>
                 <motion.button
                   whileHover={{ y: -1 }}
@@ -1675,7 +1630,7 @@ export function SettingsView({
                   }}
                   className="focus-ring cursor-pointer px-4 py-2.5 rounded-lg border border-line hover:border-accent-dim hover:bg-raised text-sm font-medium transition-colors"
                 >
-                  Import
+                  {t('settings.advanced.import')}
                 </motion.button>
               </div>
             </div>
@@ -1685,15 +1640,10 @@ export function SettingsView({
             <div className="rounded-xl border border-danger/30 bg-danger/4 p-6 flex items-center justify-between gap-6">
               <div className="min-w-0">
                 <h3 className="font-display font-semibold text-danger">
-                  Delete App Data
+                  {t('settings.advanced.deleteAppDataTitle')}
                 </h3>
                 <p className="text-xs text-muted mt-1.5 leading-relaxed">
-                  Permanently wipes every workspace, project, category,
-                  installed-version record, and setting GodotHub has stored. You
-                  will be restarted at first-time setup. Your actual project
-                  folders and Godot installs on disk are{' '}
-                  <span className="text-ink font-medium">not</span> touched,
-                  unless they live in the default download folder.
+                  {t('settings.advanced.deleteAppDataNote')}
                 </p>
               </div>
               <motion.button
@@ -1702,17 +1652,16 @@ export function SettingsView({
                 onClick={() => setConfirmingWipe(true)}
                 className="focus-ring cursor-pointer shrink-0 px-5 py-2.5 rounded-lg border border-danger/40 text-danger hover:bg-danger/10 text-sm font-medium transition-colors"
               >
-                Delete All
+                {t('settings.advanced.deleteAll')}
               </motion.button>
             </div>
             </div>
 
             <div data-section-id="advanced-updates" className="rounded-xl border border-line bg-surface/60 p-6 flex items-center justify-between gap-6">
               <div className="min-w-0">
-                <h3 className="font-display font-semibold">Check for Updates</h3>
+                <h3 className="font-display font-semibold">{t('settings.advanced.checkUpdatesTitle')}</h3>
                 <p className="text-xs text-muted mt-1.5 leading-relaxed">
-                  Check if a new version of GodotHub is available. Updates are
-                  downloaded and installed automatically, then applied on restart.
+                  {t('settings.advanced.checkUpdatesNote')}
                 </p>
               </div>
               <motion.button
@@ -1724,15 +1673,15 @@ export function SettingsView({
                 className="focus-ring cursor-pointer shrink-0 flex items-center gap-2 px-5 py-2.5 rounded-lg border border-line hover:border-accent-dim hover:bg-raised text-sm font-medium transition-colors"
               >
                 <IconRefresh className="w-4 h-4" />
-                Check for Updates
+                {t('settings.advanced.checkUpdates')}
               </motion.button>
             </div>
 
             <div className="rounded-xl border border-line bg-surface/60 p-6 flex items-center justify-between gap-6">
               <div className="min-w-0">
-                <h3 className="font-display font-semibold">Report a Bug</h3>
+                <h3 className="font-display font-semibold">{t('settings.advanced.reportBugTitle')}</h3>
                 <p className="text-xs text-muted mt-1.5 leading-relaxed">
-                  Help improve GodotHub by reporting issues on GitHub.
+                  {t('settings.advanced.reportBugNote')}
                 </p>
               </div>
               <motion.button
@@ -1744,7 +1693,7 @@ export function SettingsView({
                 className="focus-ring cursor-pointer shrink-0 flex items-center gap-2 px-5 py-2.5 rounded-lg border border-line hover:border-accent-dim hover:bg-raised text-sm font-medium transition-colors"
               >
                 <IconBug className="w-4 h-4" />
-                Report a Bug
+                {t('settings.advanced.reportBug')}
               </motion.button>
             </div>
           </motion.div>
@@ -1754,9 +1703,9 @@ export function SettingsView({
       <AnimatePresence>
         {confirmingReset && (
           <ConfirmDialog
-            title="Reset all settings?"
-            description="This restores every setting on this page, download folder, scan folders, appearance, and behavior, back to their defaults. This can't be undone."
-            confirmLabel="Reset Settings"
+            title={t('settings.confirmReset.title')}
+            description={t('settings.confirmReset.description')}
+            confirmLabel={t('settings.confirmReset.confirmLabel')}
             variant="danger"
             onConfirm={resetAllSettings}
             onCancel={() => setConfirmingReset(false)}
@@ -1764,9 +1713,9 @@ export function SettingsView({
         )}
         {confirmingWipe && (
           <ConfirmDialog
-            title="Delete all app data?"
-            description="This permanently deletes every workspace, project, category, installed-version record, and setting GodotHub has stored, and restarts you at first-time setup. Your actual project folders and Godot installs on disk are not touched, unless they live in the default download folder, in which case they're deleted too. This can't be undone."
-            confirmLabel="Delete App Data"
+            title={t('settings.confirmWipe.title')}
+            description={t('settings.confirmWipe.description')}
+            confirmLabel={t('settings.confirmWipe.confirmLabel')}
             variant="danger"
             onConfirm={wipeAppData}
             onCancel={() => setConfirmingWipe(false)}

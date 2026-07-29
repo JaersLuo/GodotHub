@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useRef, useState } from 'react'
 import { AnimatePresence, motion } from 'framer-motion'
 import { IconChevronDown } from '../Icons'
+import { useTranslation } from 'react-i18next'
 
 export interface DropdownOption {
   value: string
@@ -24,13 +25,15 @@ export function Dropdown({
   value,
   options,
   onChange,
-  emptyLabel = 'Choose Version',
+  emptyLabel,
   className = '',
   openUp,
 }: Props) {
+  const { t } = useTranslation()
   const [open, setOpen] = useState(false)
   const [computedOpenUp, setComputedOpenUp] = useState(false)
   const ref = useRef<HTMLDivElement>(null)
+  const resolvedEmptyLabel = emptyLabel ?? t('dropdown.chooseVersion')
 
   useEffect(() => {
     const handler = (e: MouseEvent) => {
@@ -81,7 +84,7 @@ export function Dropdown({
           )}
           <span className="flex items-center gap-2 min-w-0">
               <span className="truncate font-mono">
-                {selected ? selected.label : emptyLabel}
+                {selected ? selected.label : resolvedEmptyLabel}
               </span>
               {selected?.badge && (
                 <span className="shrink-0 text-[10px] px-1.5 py-0.5 rounded-md bg-accent/10 text-accent-bright border border-accent-dim/40 font-semibold">
@@ -117,7 +120,7 @@ export function Dropdown({
               }`}
             >
               <span className="w-2 h-2 rounded-full bg-line" />
-              {emptyLabel}
+              {resolvedEmptyLabel}
             </button>
             {options.map((o, idx) => (
               <button

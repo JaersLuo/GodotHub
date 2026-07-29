@@ -7,6 +7,7 @@ import {
   type ReactNode,
 } from 'react'
 import { api } from '../lib/api'
+import i18n from '../i18n'
 import type { Workspace, WorkspacesState } from '../types'
 
 interface WorkspacesContextValue {
@@ -87,7 +88,7 @@ export function useWorkspaces() {
   const ctx = useContext(WorkspacesContext)
   if (!ctx)
     throw new Error(
-      'useWorkspaces() must be used within a <WorkspacesProvider>',
+      i18n.t('hooks.useWorkspacesError'),
     )
   return ctx
 }

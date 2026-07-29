@@ -1,5 +1,6 @@
 import { createContext, useContext, type ReactNode } from 'react'
 import { useCategories } from './useCategories'
+import i18n from '../i18n'
 
 export type CategoriesApi = ReturnType<typeof useCategories>
 
@@ -18,7 +19,7 @@ export function useCategoriesContext() {
   const ctx = useContext(CategoriesContext)
   if (!ctx)
     throw new Error(
-      'useCategoriesContext must be used within a CategoriesProvider',
+      i18n.t('hooks.useCategoriesContextError'),
     )
   return ctx
 }

@@ -1,5 +1,6 @@
 import { useState, useCallback, useEffect } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
+import { useTranslation } from 'react-i18next'
 import {
   DndContext,
   DragOverlay,
@@ -58,6 +59,7 @@ function SortableCategoryItem({
   onEditValueChange,
   onEditColorChange,
   onConfirmDelete,
+  t,
 }: {
   category: Category
   editing: boolean
@@ -69,6 +71,7 @@ function SortableCategoryItem({
   onEditValueChange: (value: string) => void
   onEditColorChange: (color: string) => void
   onConfirmDelete: () => void
+  t: (key: string, opts?: Record<string, unknown>) => string
 }) {
   const {
     attributes,
@@ -125,14 +128,14 @@ function SortableCategoryItem({
           <div className="flex flex-col gap-1 shrink-0">
             <button
               onClick={onSubmitEdit}
-              aria-label="Save"
+              aria-label={t('common.save')}
               className="focus-ring cursor-pointer p-1.5 rounded-md text-mint hover:bg-surface transition-colors"
             >
               <IconCheck className="w-4 h-4" />
             </button>
             <button
               onClick={onCancelEdit}
-              aria-label="Cancel"
+              aria-label={t('common.cancel')}
               className="focus-ring cursor-pointer p-1.5 rounded-md text-muted hover:bg-surface transition-colors"
             >
               <IconX className="w-3.5 h-3.5" />
@@ -148,14 +151,14 @@ function SortableCategoryItem({
           <span className="flex-1 text-sm truncate">{category.name}</span>
           <button
             onClick={onStartEdit}
-            aria-label={`Edit ${category.name}`}
+            aria-label={t('categoryManager.editCategoryAria', { name: category.name })}
             className="focus-ring cursor-pointer p-1.5 rounded-md text-muted opacity-0 group-hover:opacity-100 hover:text-ink hover:bg-surface transition-colors"
           >
             <IconPencil className="w-3.5 h-3.5" />
           </button>
           <button
             onClick={onConfirmDelete}
-            aria-label={`Delete ${category.name}`}
+            aria-label={t('categoryManager.deleteCategoryAria', { name: category.name })}
             className="focus-ring cursor-pointer p-1.5 rounded-md text-muted opacity-0 group-hover:opacity-100 hover:text-danger hover:bg-surface transition-colors"
           >
             <IconTrash className="w-3.5 h-3.5" />
@@ -174,6 +177,7 @@ export function CategoryManagerModal({
   onDelete,
   onReorder,
 }: Props) {
+  const { t } = useTranslation()
   const [newName, setNewName] = useState('')
   const [newColor, setNewColor] = useState(CATEGORY_COLORS[0])
   const [error, setError] = useState<string | null>(null)
@@ -288,11 +292,10 @@ export function CategoryManagerModal({
       >
         <div>
           <h3 className="font-display font-semibold text-lg">
-            Manage Categories
+            {t('categoryManager.title')}
           </h3>
           <p className="text-xs text-muted mt-1.5">
-            Create your own categories, drag to reorder, and file projects into
-            them from the Projects list.
+            {t('categoryManager.description')}
           </p>
         </div>
 
@@ -302,7 +305,7 @@ export function CategoryManagerModal({
               value={newName}
               onChange={(e) => setNewName(e.target.value)}
               onKeyDown={(e) => e.key === 'Enter' && submitNew()}
-              placeholder="New category name…"
+              placeholder={t('categoryManager.newCategoryPlaceholder')}
               className="focus-ring flex-1 bg-raised border border-line rounded-lg px-3.5 py-2.5 text-sm focus:border-accent-dim transition-colors"
             />
             <motion.button
@@ -313,11 +316,11 @@ export function CategoryManagerModal({
               className="focus-ring cursor-pointer shrink-0 flex items-center gap-1.5 px-4 py-2.5 rounded-lg bg-accent hover:bg-accent-bright disabled:opacity-50 disabled:cursor-not-allowed text-sm font-medium text-white transition-colors"
             >
               <IconPlus className="w-3.5 h-3.5" />
-              Add
+              {t('common.add')}
             </motion.button>
           </div>
           <ColorSwatchPicker
-            label="Color"
+            label={t('categoryManager.color')}
             value={newColor}
             onChange={setNewColor}
             presets={CATEGORY_COLORS}
@@ -339,7 +342,7 @@ export function CategoryManagerModal({
             <div className="flex flex-col gap-2 max-h-72 overflow-y-auto">
               {categories.length === 0 ? (
                 <p className="text-xs text-muted text-center py-6">
-                  No categories yet, add one above.
+                  {t('categoryManager.emptyState')}
                 </p>
               ) : (
                 <AnimatePresence initial={false}>
@@ -359,6 +362,7 @@ export function CategoryManagerModal({
                         onEditValueChange={setEditValue}
                         onEditColorChange={setEditColor}
                         onConfirmDelete={() => setConfirmDeleteId(cat.id)}
+                        t={t}
                       />
                     )
                   })}
@@ -393,7 +397,7 @@ export function CategoryManagerModal({
             onClick={onClose}
             className="focus-ring cursor-pointer px-4 py-2.5 rounded-lg text-sm text-muted hover:text-ink hover:bg-raised transition-colors"
           >
-            Done
+            {t('common.done')}
           </motion.button>
         </div>
       </motion.div>
@@ -401,9 +405,9 @@ export function CategoryManagerModal({
       {confirmDelete && (
         <div onClick={(e) => e.stopPropagation()}>
           <ConfirmDialog
-            title="Delete category?"
-            description={`"${confirmDelete.name}" will be removed. Projects filed under it move to Uncategorized, nothing on disk is touched.`}
-            confirmLabel="Delete"
+            title={t('categoryManager.confirmDeleteTitle')}
+            description={t('categoryManager.confirmDeleteDescription', { name: confirmDelete.name })}
+            confirmLabel={t('common.delete')}
             variant="danger"
             onConfirm={() => {
               onDelete(confirmDelete.id)
