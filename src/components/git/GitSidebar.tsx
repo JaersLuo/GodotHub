@@ -106,7 +106,7 @@ function Checkbox({
 }
 
 export function GitSidebar({ project, gitStatus, onClose, onRefresh }: Props) {
-  const { t } = useTranslation()
+  const { t } = useTranslation('gitSidebar')
   const [displayName, setDisplayName] = useState<string | null>(null)
   const [remoteUrl, setRemoteUrl] = useState<string | null>(null)
   const [logEntries, setLogEntries] = useState<GitLogEntry[]>([])

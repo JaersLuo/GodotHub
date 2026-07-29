@@ -1,4 +1,4 @@
-﻿import { openUrl } from '@tauri-apps/plugin-opener'
+import { openUrl } from '@tauri-apps/plugin-opener'
 import { useTranslation } from 'react-i18next'
 import { useNews } from '../hooks/useNews'
 import {
@@ -87,10 +87,10 @@ export function NewsView() {
         <div className="flex items-start justify-between gap-4 mb-5">
           <div>
             <h2 className="font-body font-semibold text-3xl tracking-tight">
-              {t('.')}
+              {t('news.title')}
             </h2>
             <p className="text-xs text-muted">
-              {t('.')}
+              {t('news.description')}
             </p>
           </div>
           <button
@@ -101,14 +101,14 @@ export function NewsView() {
             <IconRefresh
               className={`w-3 h-3 ${loading ? 'animate-spin' : ''}`}
             />
-            {t('.')}
+            {t('news.refresh')}
           </button>
         </div>
 
         {fromCache && (
           <div className="mb-5 flex items-center gap-2.5 rounded-lg border border-line bg-raised/60 px-4 py-2.5 text-xs text-muted">
             <IconWifiOff className="w-3.5 h-3.5 shrink-0" />
-            {t('.')}
+            {t('news.cachedMessage')}
           </div>
         )}
 
@@ -124,14 +124,14 @@ export function NewsView() {
               <IconWifiOff className="w-5 h-5 text-muted" />
             </div>
             <p className="text-sm text-muted max-w-xs leading-relaxed">
-              {t('.')} {error}
+              {t('news.loadError')} {error}
             </p>
             <button
               onClick={reload}
               className="focus-ring cursor-pointer flex items-center gap-2 px-4 py-2 rounded-lg border border-line hover:border-accent-dim hover:bg-raised text-sm transition-colors"
             >
               <IconRefresh className="w-3.5 h-3.5" />
-              {t('.')}
+              {t('news.tryAgain')}
             </button>
           </div>
         ) : items.length === 0 ? (
@@ -140,7 +140,7 @@ export function NewsView() {
               <IconNews className="w-5 h-5 text-muted" />
             </div>
             <p className="text-sm text-muted max-w-xs leading-relaxed">
-              {t('.')}
+              {t('news.noNews')}
             </p>
           </div>
         ) : (
@@ -159,7 +159,7 @@ export function NewsView() {
                   onClick={showMore}
                   className="focus-ring cursor-pointer px-5 py-2.5 rounded-lg border border-line hover:border-accent-dim hover:bg-raised text-sm font-medium transition-colors"
                 >
-                  {t('.')}
+                  {t('news.showMore')}
                 </button>
               </div>
             )}

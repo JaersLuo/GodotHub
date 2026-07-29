@@ -1,4 +1,4 @@
-﻿import { useEffect, useState, useRef } from 'react'
+import { useEffect, useState, useRef } from 'react'
 import { useTranslation } from 'react-i18next'
 import { motion, AnimatePresence } from 'framer-motion'
 import { api } from '../lib/api'
@@ -43,8 +43,8 @@ export function TemplatesView() {
     registerTask({
       id: 'sync-templates',
       type: 'sync-templates',
-      label: t('.'),
-      description: t('.'),
+      label: t('templates.syncingTemplates'),
+      description: t('templates.starting'),
       progress: null,
       status: 'running',
     })
@@ -53,19 +53,19 @@ export function TemplatesView() {
       setSyncResult(result)
       const parts: string[] = []
       if (result.imported.length > 0)
-        parts.push(t('.', { count: result.imported.length }))
+        parts.push(t('templates.importedCount', { count: result.imported.length }))
       if (result.updated.length > 0)
-        parts.push(t('.', { count: result.updated.length }))
+        parts.push(t('templates.updatedCount', { count: result.updated.length }))
       if (result.removed.length > 0)
-        parts.push(t('.', { count: result.removed.length }))
+        parts.push(t('templates.removedCount', { count: result.removed.length }))
       setSyncMessage(
         parts.length > 0
           ? parts.join(' · ')
-          : t('.'),
+          : t('templates.upToDate'),
       )
       updateTask('sync-templates', {
         status: 'completed',
-        description: parts.length > 0 ? parts.join(' · ') : t('.'),
+        description: parts.length > 0 ? parts.join(' · ') : t('templates.upToDate'),
       })
       setTimeout(() => unregisterTask('sync-templates'), 3000)
       await load()
@@ -127,14 +127,14 @@ export function TemplatesView() {
         <div className="flex items-center justify-between gap-4">
           <div>
             <h2 className="font-body font-semibold text-3xl tracking-tight">
-              {t('.')}
+              {t('templates.title')}
             </h2>
             <p className="text-xs text-muted mt-1">
               {templates.length > 0
-                ? t('.', { count: templates.length })
-                : t('.')}
+                ? t('templates.templateCount', { count: templates.length })
+                : t('templates.noTemplatesYet')}
               {isSearching && (
-                <> · {t('.', { count: filteredTemplates.length })}</>
+                <> · {t('templates.showingCount', { count: filteredTemplates.length })}</>
               )}
             </p>
           </div>
@@ -145,7 +145,7 @@ export function TemplatesView() {
               type="text"
               value={query}
               onChange={(e) => setQuery(e.target.value)}
-              placeholder={t('.')}
+              placeholder={t('templates.searchPlaceholder')}
               className="w-full pl-9 pr-9 py-2 rounded-lg border border-line bg-surface text-sm text-ink placeholder:text-muted/50 outline-none transition-all focus:border-accent focus:ring-1 focus:ring-accent/30"
             />
             {query && (
@@ -160,7 +160,7 @@ export function TemplatesView() {
         </div>
         <div className="flex items-center gap-3 mt-4">
           <Tooltip
-            content={!settings.template_scan_dir ? t('.') : t('.')}
+            content={!settings.template_scan_dir ? t('templates.setScanDirFirst') : t('templates.syncFromDirectory')}
             side="bottom"
           >
             <motion.button
@@ -173,11 +173,11 @@ export function TemplatesView() {
               <span className={`icon-wiggle inline-flex ${syncing ? 'animate-spin' : ''}`}>
                 <IconRefresh className="w-4 h-4" />
               </span>
-              {syncing ? t('.') : t('.')}
+              {syncing ? t('templates.syncing') : t('templates.syncNow')}
             </motion.button>
           </Tooltip>
           {settings.template_scan_dir && (
-            <Tooltip content={t('.')} side="bottom">
+            <Tooltip content={t('templates.openFolderTooltip')} side="bottom">
               <motion.button
                 whileHover={{ y: -1 }}
                 whileTap={{ scale: 0.96 }}
@@ -185,7 +185,7 @@ export function TemplatesView() {
                 className="focus-ring cursor-pointer flex items-center gap-2 px-4 py-2.5 rounded-lg border border-line hover:border-accent-dim hover:bg-raised text-sm font-medium transition-colors"
               >
                 <IconExternalLink className="w-4 h-4" />
-                {t('.')}
+                {t('templates.openFolder')}
               </motion.button>
             </Tooltip>
           )}
@@ -198,21 +198,21 @@ export function TemplatesView() {
       </div>
 
       {!loaded ? (
-        <div className="text-sm text-muted">{t('.')}</div>
+        <div className="text-sm text-muted">{t('templates.loading')}</div>
       ) : templates.length === 0 ? (
         <div className="border border-dashed border-line rounded-2xl py-24 flex flex-col items-center gap-4 text-center">
           <div className="w-12 h-12 rounded-xl bg-raised border border-line flex items-center justify-center">
             <IconCopy className="w-5 h-5 text-muted" />
           </div>
           <p className="text-sm text-muted max-w-xs leading-relaxed">
-            <span dangerouslySetInnerHTML={{ __html: t('.') }} />
+            <span dangerouslySetInnerHTML={{ __html: t('templates.emptyState') }} />
           </p>
         </div>
       ) : filteredTemplates.length === 0 ? (
         <div className="border border-dashed border-line rounded-2xl py-24 flex flex-col items-center gap-4 text-center">
           <IconSearch className="w-5 h-5 text-muted" />
           <p className="text-sm text-muted max-w-xs leading-relaxed">
-            <span dangerouslySetInnerHTML={{ __html: t('.', { query: `<strong>"${query}"</strong>` }) }} />
+            <span dangerouslySetInnerHTML={{ __html: t('templates.noMatch', { query: `<strong>"${query}"</strong>` }) }} />
           </p>
         </div>
       ) : (
@@ -223,7 +223,7 @@ export function TemplatesView() {
               <div className="flex items-center gap-2 mb-4">
                 <IconCopy className="w-3.5 h-3.5 text-muted" />
                 <h3 className="text-xs font-semibold uppercase tracking-wide text-muted">
-                  {t('.')}
+                  {t('templates.yourTemplates')}
                 </h3>
                 <span className="text-[10px] text-muted/50">· {user.length}</span>
               </div>
@@ -246,7 +246,7 @@ export function TemplatesView() {
                         <button
                           onClick={(e) => { e.stopPropagation(); setConfirmDelete(tmpl.id) }}
                           className="focus-ring cursor-pointer p-1.5 rounded-lg text-muted/40 opacity-0 group-hover:opacity-100 hover:text-danger hover:bg-danger/10 transition-all"
-                          aria-label={t('.', { name: tmpl.name })}
+                          aria-label={t('templates.deleteTemplateAriaLabel', { name: tmpl.name })}
                         >
                           <IconTrash className="w-3.5 h-3.5" />
                         </button>
@@ -316,12 +316,12 @@ export function TemplatesView() {
                 </div>
                 <div>
                   <h4 className="font-display font-semibold text-base">
-                    {t('.')}
+                    {t('templates.deleteTitle')}
                   </h4>
                   <p className="text-xs text-muted mt-0.5">
                     {templates.find((t) => t.id === confirmDelete)?.name
-                      ? t('.', { name: templates.find((t) => t.id === confirmDelete)?.name })
-                      : t('.')}
+                      ? t('templates.deleteWithName', { name: templates.find((t) => t.id === confirmDelete)?.name })
+                      : t('templates.deleteCannotUndo')}
                   </p>
                 </div>
               </div>
@@ -342,7 +342,7 @@ export function TemplatesView() {
                   disabled={deleting}
                   className="focus-ring cursor-pointer px-4 py-2.5 rounded-lg bg-danger hover:bg-danger/80 disabled:opacity-50 text-sm font-medium text-white transition-colors"
                 >
-                  {deleting ? t('.') : t('.')}
+                  {deleting ? t('templates.deleting') : t('templates.delete')}
                 </motion.button>
               </div>
             </motion.div>
@@ -356,13 +356,13 @@ export function TemplatesView() {
           <div className="bg-surface border border-line rounded-2xl px-8 py-6 flex flex-col items-center gap-3 min-w-64">
             <IconRefresh className="w-6 h-6 animate-spin text-accent" />
             <p className="text-sm font-medium text-ink">
-              {t('.')}
+              {t('templates.syncingFromDirectory')}
             </p>
             <button
               onClick={() => setDialogMinimized(true)}
               className="focus-ring cursor-pointer text-xs text-muted hover:text-ink transition-colors mt-1"
             >
-              {t('.')}
+              {t('templates.resumeInBackground')}
             </button>
           </div>
         </div>

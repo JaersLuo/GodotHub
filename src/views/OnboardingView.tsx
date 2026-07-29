@@ -1,7 +1,7 @@
 import { useMemo, useState } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { useTranslation } from 'react-i18next'
-import i18n from '../i18n'
+import { LanguageSelector } from '../components/ui/LanguageSelector'
 import { applyTheme } from '../lib/colors'
 import { applyRadius } from '../lib/appearance'
 import { useCategoriesContext } from '../hooks/categoriesContext'
@@ -272,18 +272,7 @@ export function OnboardingView({ settings, onComplete }: Props) {
                     <label className="text-xs font-medium text-muted shrink-0">
                       {t('language.label')}
                     </label>
-                    <select
-                      value={i18n.language || 'en'}
-                      onChange={(e) => {
-                        const lang = e.target.value
-                        i18n.changeLanguage(lang)
-                        localStorage.setItem('godothub_language', lang)
-                      }}
-                      className="flex-1 bg-raised border border-line rounded-lg px-3 py-2 text-sm focus:border-accent-dim transition-colors cursor-pointer"
-                    >
-                      <option value="en">{t('language.english')}</option>
-                      <option value="zh">{t('language.chinese')}</option>
-                    </select>
+                    <LanguageSelector />
                   </div>
                   <div className="grid grid-cols-3 gap-3">
                   <div className="flex flex-col gap-2 p-4 rounded-xl border border-line bg-surface/60">

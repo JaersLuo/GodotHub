@@ -1,4 +1,4 @@
-﻿import { useEffect, useRef, useState, memo } from 'react'
+import { useEffect, useRef, useState, memo } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import type { Category, GitStatus, InstalledGodotVersion, Project } from '../../types'
 import { api, getCachedProjectIcon, getCachedProjectName } from '../../lib/api'

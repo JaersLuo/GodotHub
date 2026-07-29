@@ -22,7 +22,7 @@ function ViewErrorBoundaryUI({
   error: Error | null
   onRetry: () => void
 }) {
-  const { t } = useTranslation()
+  const { t } = useTranslation('viewErrorBoundary')
 
   if (!error) return children
 
