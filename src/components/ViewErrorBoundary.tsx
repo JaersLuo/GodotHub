@@ -22,7 +22,7 @@ function ViewErrorBoundaryUI({
   error: Error | null
   onRetry: () => void
 }) {
-  const { t } = useTranslation('viewErrorBoundary')
+  const { t } = useTranslation()
 
   if (!error) return children
 
@@ -33,10 +33,10 @@ function ViewErrorBoundaryUI({
       </div>
       <div className="text-center max-w-sm">
         <h3 className="font-semibold text-sm text-ink mb-1">
-          {t('encounteredError', { name })}
+          {t('viewErrorBoundary.encounteredError', { name })}
         </h3>
         <p className="text-xs text-muted leading-relaxed">
-          {t('errorDescription')}
+          {t('viewErrorBoundary.errorDescription')}
         </p>
       </div>
       <pre className="text-[11px] text-danger/80 bg-danger/5 border border-danger/20 rounded-lg px-4 py-3 max-w-full overflow-auto max-h-24 select-all">
@@ -48,14 +48,14 @@ function ViewErrorBoundaryUI({
           className="focus-ring cursor-pointer flex items-center gap-2 px-4 py-2 rounded-lg bg-accent hover:bg-accent-bright text-xs font-medium text-white transition-colors"
         >
           <IconRefresh className="w-3.5 h-3.5" />
-          {t('retry')}
+          {t('viewErrorBoundary.retry')}
         </button>
         <button
           onClick={() => window.dispatchEvent(new CustomEvent('app:report-bug'))}
           className="focus-ring cursor-pointer flex items-center gap-2 px-4 py-2 rounded-lg border border-danger/40 text-danger hover:bg-danger/10 hover:border-danger text-xs font-medium transition-colors"
         >
           <IconBug className="w-3.5 h-3.5" />
-          {t('reportBug')}
+          {t('viewErrorBoundary.reportBug')}
         </button>
       </div>
     </div>

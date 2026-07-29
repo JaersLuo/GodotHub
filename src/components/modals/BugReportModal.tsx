@@ -61,15 +61,15 @@ async function getGPUInfo(t: (key: string) => string): Promise<string> {
   try {
     const canvas = document.createElement('canvas')
     const gl = canvas.getContext('webgl') || canvas.getContext('experimental-webgl')
-    if (!gl) return t('report.webglNotAvailable')
+    if (!gl) return t('bugReport.report.webglNotAvailable')
     const debugInfo = (gl as WebGLRenderingContext).getExtension('WEBGL_debug_renderer_info')
-    if (!debugInfo) return t('report.gpuInfoUnavailable')
+    if (!debugInfo) return t('bugReport.report.gpuInfoUnavailable')
     const renderer = (gl as WebGLRenderingContext).getParameter(debugInfo.UNMASKED_RENDERER_WEBGL)
     const vendor = (gl as WebGLRenderingContext).getParameter(debugInfo.UNMASKED_VENDOR_WEBGL)
     canvas.remove()
     return `${vendor}, ${renderer}`
   } catch {
-    return t('report.gpuInfoUnavailable')
+    return t('bugReport.report.gpuInfoUnavailable')
   }
 }
 
@@ -77,32 +77,32 @@ async function buildReport(t: (key: string) => string): Promise<string> {
   const gpu = await getGPUInfo(t)
 
   const lines: string[] = [
-    t('report.title'),
+    t('bugReport.report.title'),
     '',
-    `${t('report.version')}: ${version}`,
-    `${t('report.date')}: ${new Date().toISOString().slice(0, 10)}`,
+    `${t('bugReport.report.version')}: ${version}`,
+    `${t('bugReport.report.date')}: ${new Date().toISOString().slice(0, 10)}`,
     '',
-    t('report.system'),
-    `${t('report.os')}: ${navigator.userAgent.includes('Windows') ? 'Windows' : navigator.userAgent.includes('Mac OS X') || navigator.userAgent.includes('macOS') ? 'macOS' : navigator.userAgent.includes('Linux') ? 'Linux' : navigator.userAgent}`,
-    `${t('report.platform')}: ${navigator.platform}`,
-    `${t('report.language')}: ${navigator.language}`,
-    `${t('report.cpuCores')}: ${navigator.hardwareConcurrency ?? t('report.unknown')}`,
-    `${t('report.ram')}: ${(navigator as Navigator & { deviceMemory?: number }).deviceMemory ? `${(navigator as Navigator & { deviceMemory?: number }).deviceMemory} GB` : t('report.unknown')}`,
-    `${t('report.screen')}: ${screen.width}x${screen.height} @${screen.colorDepth}bit`,
-    `${t('report.gpu')}: ${gpu}`,
-    `${t('report.userAgent')}: ${navigator.userAgent}`,
+    t('bugReport.report.system'),
+    `${t('bugReport.report.os')}: ${navigator.userAgent.includes('Windows') ? 'Windows' : navigator.userAgent.includes('Mac OS X') || navigator.userAgent.includes('macOS') ? 'macOS' : navigator.userAgent.includes('Linux') ? 'Linux' : navigator.userAgent}`,
+    `${t('bugReport.report.platform')}: ${navigator.platform}`,
+    `${t('bugReport.report.language')}: ${navigator.language}`,
+    `${t('bugReport.report.cpuCores')}: ${navigator.hardwareConcurrency ?? t('bugReport.report.unknown')}`,
+    `${t('bugReport.report.ram')}: ${(navigator as Navigator & { deviceMemory?: number }).deviceMemory ? `${(navigator as Navigator & { deviceMemory?: number }).deviceMemory} GB` : t('bugReport.report.unknown')}`,
+    `${t('bugReport.report.screen')}: ${screen.width}x${screen.height} @${screen.colorDepth}bit`,
+    `${t('bugReport.report.gpu')}: ${gpu}`,
+    `${t('bugReport.report.userAgent')}: ${navigator.userAgent}`,
   ]
 
   if (capturedErrors.length > 0) {
-    lines.push('', t('report.recentErrors'))
+    lines.push('', t('bugReport.report.recentErrors'))
     for (const err of capturedErrors) {
       lines.push(`  [${err.time}] (${err.source}) ${err.message}`)
     }
   } else {
-    lines.push('', t('report.recentErrors'), t('report.noErrorsCaptured'))
+    lines.push('', t('bugReport.report.recentErrors'), t('bugReport.report.noErrorsCaptured'))
   }
 
-  lines.push('', t('report.end'))
+  lines.push('', t('bugReport.report.end'))
   return lines.join('\n')
 }
 
@@ -169,9 +169,9 @@ export function BugReportModal({ onClose }: Props) {
             <IconBug className="w-5 h-5 text-danger" />
           </div>
           <div>
-            <h3 className="font-display font-semibold text-lg">{t('title')}</h3>
+            <h3 className="font-display font-semibold text-lg">{t('bugReport.title')}</h3>
             <p className="text-xs text-muted mt-0.5">
-              {t('description', { version })}
+              {t('bugReport.description', { version })}
             </p>
           </div>
         </div>
@@ -198,7 +198,7 @@ export function BugReportModal({ onClose }: Props) {
             className="focus-ring cursor-pointer flex items-center gap-2 px-4 py-2.5 rounded-lg border border-line text-sm text-muted hover:text-ink hover:border-accent-dim hover:bg-raised transition-colors disabled:opacity-40 disabled:cursor-not-allowed"
           >
             <IconCopy className="w-4 h-4" />
-            {t('copyLog')}
+            {t('bugReport.copyLog')}
           </button>
           <div className="flex items-center gap-2.5">
             <motion.button
@@ -209,7 +209,7 @@ export function BugReportModal({ onClose }: Props) {
               className="focus-ring cursor-pointer flex items-center gap-2 px-4 py-2.5 rounded-lg border border-line text-sm text-muted hover:text-ink hover:border-accent-dim hover:bg-raised transition-colors disabled:opacity-40 disabled:cursor-not-allowed"
             >
               <IconDownload className="w-4 h-4" />
-              {t('downloadLog')}
+              {t('bugReport.downloadLog')}
             </motion.button>
             <motion.button
               whileHover={{ y: -1 }}
@@ -221,7 +221,7 @@ export function BugReportModal({ onClose }: Props) {
               className="focus-ring cursor-pointer flex items-center gap-2 px-4 py-2.5 rounded-lg bg-danger hover:bg-danger/90 text-sm font-medium text-white transition-colors"
             >
               <IconExternalLink className="w-4 h-4" />
-              {t('openGithubIssues')}
+              {t('bugReport.openGithubIssues')}
             </motion.button>
           </div>
         </div>

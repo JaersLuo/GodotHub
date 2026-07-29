@@ -33,9 +33,9 @@ function ErrorBoundaryUI({
         textAlign: 'center',
       }}
     >
-      <h1 style={{ fontSize: 18, fontWeight: 600 }}>{t('somethingWentWrong')}</h1>
+      <h1 style={{ fontSize: 18, fontWeight: 600 }}>{t('errorBoundary.somethingWentWrong')}</h1>
       <p style={{ fontSize: 13, color: '#949ba4', maxWidth: 480 }}>
-        {t('errorDescription')}
+        {t('errorBoundary.errorDescription')}
       </p>
       <pre
         style={{
@@ -63,7 +63,7 @@ function ErrorBoundaryUI({
           fontSize: 13,
         }}
       >
-        {t('reload')}
+        {t('errorBoundary.reload')}
       </button>
     </div>
   )

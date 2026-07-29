@@ -55,12 +55,12 @@ export function DiffViewer({ projectPath, filePath, onClose }: Props) {
           {/* Header */}
           <div className="flex items-center justify-between px-5 py-3 border-b border-line shrink-0">
             <div className="flex items-center gap-2 min-w-0">
-              <span className="text-[10px] font-bold uppercase tracking-wider text-muted/60 shrink-0">{t('diff')}</span>
+              <span className="text-[10px] font-bold uppercase tracking-wider text-muted/60 shrink-0">{t('diffViewer.diff')}</span>
               <span className="text-sm font-mono text-ink truncate">{filePath}</span>
             </div>
             <button
               onClick={onClose}
-              aria-label={t('close')}
+              aria-label={t('diffViewer.close')}
               className="focus-ring cursor-pointer p-1 rounded-lg text-muted hover:text-ink hover:bg-raised transition-colors shrink-0"
             >
               <IconX className="w-4 h-4" />
@@ -75,7 +75,7 @@ export function DiffViewer({ projectPath, filePath, onClose }: Props) {
               </div>
             ) : !diff || diff.hunks.length === 0 ? (
               <div className="flex items-center justify-center py-16 text-muted text-sm">
-                {t('noChanges')}
+                {t('diffViewer.noChanges')}
               </div>
             ) : (
               diff.hunks.map((hunk, hunkIdx) => (

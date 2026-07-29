@@ -58,13 +58,13 @@ function truncateMessage(msg: string): string {
 
 function statusLabel(status: string, t: (key: string) => string): { short: string; color: string; label: string } {
   const s = status.trim()
-  if (s === 'M' || s === 'M ') return { short: 'M', color: 'text-amber', label: t('modified') }
-  if (s === 'A' || s === 'A ') return { short: 'A', color: 'text-mint', label: t('added') }
-  if (s === 'D' || s === 'D ') return { short: 'D', color: 'text-danger', label: t('deleted') }
-  if (s === 'R' || s === 'R ') return { short: 'R', color: 'text-accent-bright', label: t('renamed') }
-  if (s === 'C' || s === 'C ') return { short: 'C', color: 'text-accent-bright', label: t('copied') }
-  if (s.includes('?')) return { short: '?', color: 'text-muted', label: t('untracked') }
-  if (s.includes('U')) return { short: 'U', color: 'text-danger', label: t('unmerged') }
+  if (s === 'M' || s === 'M ') return { short: 'M', color: 'text-amber', label: t('gitSidebar.modified') }
+  if (s === 'A' || s === 'A ') return { short: 'A', color: 'text-mint', label: t('gitSidebar.added') }
+  if (s === 'D' || s === 'D ') return { short: 'D', color: 'text-danger', label: t('gitSidebar.deleted') }
+  if (s === 'R' || s === 'R ') return { short: 'R', color: 'text-accent-bright', label: t('gitSidebar.renamed') }
+  if (s === 'C' || s === 'C ') return { short: 'C', color: 'text-accent-bright', label: t('gitSidebar.copied') }
+  if (s.includes('?')) return { short: '?', color: 'text-muted', label: t('gitSidebar.untracked') }
+  if (s.includes('U')) return { short: 'U', color: 'text-danger', label: t('gitSidebar.unmerged') }
   return { short: s, color: 'text-muted', label: s }
 }
 
@@ -106,7 +106,7 @@ function Checkbox({
 }
 
 export function GitSidebar({ project, gitStatus, onClose, onRefresh }: Props) {
-  const { t } = useTranslation('gitSidebar')
+  const { t } = useTranslation()
   const [displayName, setDisplayName] = useState<string | null>(null)
   const [remoteUrl, setRemoteUrl] = useState<string | null>(null)
   const [logEntries, setLogEntries] = useState<GitLogEntry[]>([])
@@ -319,7 +319,7 @@ export function GitSidebar({ project, gitStatus, onClose, onRefresh }: Props) {
       setBusyAction('abort-merge')
       await api.gitAbortMerge(project.path)
       setShowMergeConflicts(false)
-      addToast('success', t('mergeAborted'))
+      addToast('success', t('gitSidebar.mergeAborted'))
       await refreshAll()
       onRefresh()
       window.dispatchEvent(new CustomEvent('app:refresh-git-status'))
@@ -339,7 +339,7 @@ export function GitSidebar({ project, gitStatus, onClose, onRefresh }: Props) {
     })
     if (ok && prevBranch && prevBranch !== name) {
       pushUndo(
-        t('switchToBranch', { name }),
+        t('gitSidebar.switchToBranch', { name }),
         async () => { await api.gitSwitchBranch(project.path, prevBranch) },
         async () => { await api.gitSwitchBranch(project.path, name) },
       )
@@ -355,7 +355,7 @@ export function GitSidebar({ project, gitStatus, onClose, onRefresh }: Props) {
     })
     if (ok) {
       pushUndo(
-        t('createBranch', { name: branchName }),
+        t('gitSidebar.createBranch', { name: branchName }),
         async () => { await api.gitDeleteBranch(project.path, branchName) },
         async () => { await api.gitCreateBranch(project.path, branchName) },
       )
@@ -372,7 +372,7 @@ export function GitSidebar({ project, gitStatus, onClose, onRefresh }: Props) {
       if (stashResult) {
         const match = stashResult.match(/stash@\{([^}]+)\}/)
         const stashLabel = match ? `stash@{${match[1]}}` : 'latest'
-        addToast('info', t('changesSavedToStash', { label: stashLabel }))
+        addToast('info', t('gitSidebar.changesSavedToStash', { label: stashLabel }))
       }
       await api.gitDiscardChanges(project.path)
     })
@@ -410,7 +410,7 @@ export function GitSidebar({ project, gitStatus, onClose, onRefresh }: Props) {
       }
       setStagedFiles(new Set())
       await refreshAll()
-      addToast('success', t('filesStaged', { count: stagedFiles.size }))
+      addToast('success', t('gitSidebar.filesStaged', { count: stagedFiles.size }))
     } catch (e) {
       showGitError(String(e))
     } finally {
@@ -433,11 +433,11 @@ export function GitSidebar({ project, gitStatus, onClose, onRefresh }: Props) {
       }
 
       const result = await api.gitCommit(project.path, msg, amendMode)
-      showGitSuccess(amendMode ? t('commitAmended') : t('committed'), result || t('changesCommittedSuccessfully'))
+      showGitSuccess(amendMode ? t('gitSidebar.commitAmended') : t('gitSidebar.committed'), result || t('gitSidebar.changesCommittedSuccessfully'))
 
       if (!amendMode) {
         pushUndo(
-          t('commitMessage', { msg: msg.length > 30 ? msg.slice(0, 30) + '…' : msg }),
+          t('gitSidebar.commitMessage', { msg: msg.length > 30 ? msg.slice(0, 30) + '…' : msg }),
           async () => { await api.gitUndoCommit(project.path) },
           async () => {
             await api.gitStageFile(project.path, '.')
@@ -449,9 +449,9 @@ export function GitSidebar({ project, gitStatus, onClose, onRefresh }: Props) {
       if (pushAfterCommit && remoteUrl) {
         try {
           const pushResult = await api.gitPush(project.path)
-          if (pushResult) showGitSuccess(t('pushed'), pushResult)
+          if (pushResult) showGitSuccess(t('gitSidebar.pushed'), pushResult)
         } catch (e) {
-          showGitError(t('pushFailed', { error: String(e) }))
+          showGitError(t('gitSidebar.pushFailed', { error: String(e) }))
         }
       }
 
@@ -482,13 +482,13 @@ export function GitSidebar({ project, gitStatus, onClose, onRefresh }: Props) {
     if (ok) {
       if (prevUrl) {
         pushUndo(
-          t('setRemoteUrl'),
+          t('gitSidebar.setRemoteUrl'),
           async () => { await api.gitSetRemote(project.path, prevUrl); setRemoteUrl(prevUrl) },
           async () => { await api.gitSetRemote(project.path, newUrl); setRemoteUrl(newUrl) },
         )
       } else {
         pushUndo(
-          t('addRemoteUrl'),
+          t('gitSidebar.addRemoteUrl'),
           async () => { await api.gitRemoveRemote(project.path); setRemoteUrl(null) },
           async () => { await api.gitSetRemote(project.path, newUrl); setRemoteUrl(newUrl) },
         )
@@ -504,7 +504,7 @@ export function GitSidebar({ project, gitStatus, onClose, onRefresh }: Props) {
     })
     if (ok && removedUrl) {
       pushUndo(
-        t('removeRemote'),
+        t('gitSidebar.removeRemote'),
         async () => { await api.gitSetRemote(project.path, removedUrl); setRemoteUrl(removedUrl) },
         async () => { await api.gitRemoveRemote(project.path); setRemoteUrl(null) },
       )
@@ -523,18 +523,18 @@ export function GitSidebar({ project, gitStatus, onClose, onRefresh }: Props) {
     await doAction(force ? 'force-push' : 'push', async () => {
       try {
         const r = force ? await api.gitPushForce(project.path) : await api.gitPush(project.path)
-        if (r) showGitSuccess(force ? t('forcePushSucceeded') : t('pushed'), r)
+        if (r) showGitSuccess(force ? t('gitSidebar.forcePushSucceeded') : t('gitSidebar.pushed'), r)
       } catch (e: unknown) {
         const errStr = String(e)
         if (!force && (errStr.toLowerCase().includes('non-fast-forward') || errStr.toLowerCase().includes('[rejected]') || errStr.toLowerCase().includes('failed to push'))) {
-          addToast('info', t('pushRejectedPullingFirst'))
+          addToast('info', t('gitSidebar.pushRejectedPullingFirst'))
           try {
             await api.gitPull(project.path)
             const retry = await api.gitPush(project.path)
-            showGitSuccess(t('pushSucceededAfterPull'), retry || t('changesPushedSuccessfully'))
+            showGitSuccess(t('gitSidebar.pushSucceededAfterPull'), retry || t('gitSidebar.changesPushedSuccessfully'))
             return
           } catch (pullErr) {
-            showGitError(t('pullThenPushFailed', { error: String(pullErr) }))
+            showGitError(t('gitSidebar.pullThenPushFailed', { error: String(pullErr) }))
             throw pullErr
           }
         }
@@ -563,23 +563,23 @@ export function GitSidebar({ project, gitStatus, onClose, onRefresh }: Props) {
           <div className="flex items-center gap-2">
             <IconGitBranch className="w-4 h-4 text-accent-bright shrink-0" />
             <h3 className="font-display font-semibold truncate">{displayName ?? project.name}</h3>
-            <Tooltip content={t('betaTooltip')} side="bottom">
+            <Tooltip content={t('gitSidebar.betaTooltip')} side="bottom">
               <button
                 onClick={() => window.dispatchEvent(new CustomEvent('app:switch-tab', { detail: 4 }))}
                 className="text-[9px] font-bold uppercase tracking-wider px-1.5 py-0.5 rounded-md bg-amber/15 text-amber border border-amber/30 hover:bg-amber/25 hover:border-amber/50 cursor-pointer shrink-0 transition-colors"
               >
-                {t('beta')}
+                {t('gitSidebar.beta')}
               </button>
             </Tooltip>
           </div>
           {isRepo && currentBranch && (
             <p className="text-[11px] font-mono text-muted mt-0.5 truncate">
               {currentBranch.name}
-              {changedFiles.length > 0 && <span className="ml-1.5 text-amber">· {changedFiles.length} {t('uncommitted')}</span>}
+              {changedFiles.length > 0 && <span className="ml-1.5 text-amber">· {changedFiles.length} {t('gitSidebar.uncommitted')}</span>}
             </p>
           )}
         </div>
-        <button onClick={onClose} aria-label={t('closeSidebar')} className="focus-ring cursor-pointer p-1.5 rounded-lg text-muted hover:text-ink hover:bg-raised transition-colors shrink-0">
+        <button onClick={onClose} aria-label={t('gitSidebar.closeSidebar')} className="focus-ring cursor-pointer p-1.5 rounded-lg text-muted hover:text-ink hover:bg-raised transition-colors shrink-0">
           <IconX className="w-4 h-4" />
         </button>
       </div>
@@ -587,11 +587,11 @@ export function GitSidebar({ project, gitStatus, onClose, onRefresh }: Props) {
       {!isRepo ? (
         <div className="flex-1 flex flex-col items-center justify-center gap-4 p-8 text-center">
           <IconGitBranch className="w-10 h-10 text-muted/40" />
-          <p className="text-sm text-muted">{t('notGitRepo')}</p>
+          <p className="text-sm text-muted">{t('gitSidebar.notGitRepo')}</p>
           <button disabled={busyAction === 'init'} onClick={handleInit}
             className="focus-ring cursor-pointer flex items-center gap-2 px-5 py-2.5 rounded-lg bg-accent hover:bg-accent-bright disabled:opacity-50 disabled:cursor-not-allowed text-xs font-medium text-white transition-colors">
             <IconFolderPlus className="w-3.5 h-3.5" />
-            {busyAction === 'init' ? t('initializing') : t('initializeRepo')}
+            {busyAction === 'init' ? t('gitSidebar.initializing') : t('gitSidebar.initializeRepo')}
           </button>
         </div>
       ) : (
@@ -602,19 +602,19 @@ export function GitSidebar({ project, gitStatus, onClose, onRefresh }: Props) {
             {mergeActive && !showMergeConflicts && (
               <div className="w-full flex items-center gap-2 px-3 py-2 rounded-lg bg-danger/10 border border-danger/30 mb-1">
                 <IconAlertTriangle className="w-3.5 h-3.5 text-danger shrink-0" />
-                <span className="flex-1 text-[11px] text-danger font-medium">{t('mergeInProgress')}</span>
+                <span className="flex-1 text-[11px] text-danger font-medium">{t('gitSidebar.mergeInProgress')}</span>
                 <button
                   onClick={() => setShowMergeConflicts(true)}
                   className="focus-ring cursor-pointer text-[10px] text-accent-bright hover:underline font-medium"
                 >
-                  {t('resolve')}
+                  {t('gitSidebar.resolve')}
                 </button>
                 <button
                   onClick={handleAbortMerge}
                   disabled={busyAction !== null}
                   className="focus-ring cursor-pointer text-[10px] text-danger hover:underline disabled:opacity-40 font-medium"
                 >
-                  {t('abort')}
+                  {t('gitSidebar.abort')}
                 </button>
               </div>
             )}
@@ -633,24 +633,24 @@ export function GitSidebar({ project, gitStatus, onClose, onRefresh }: Props) {
               className={`focus-ring cursor-pointer flex items-center gap-1.5 px-3 py-1.5 rounded-lg disabled:opacity-50 disabled:cursor-not-allowed text-[11px] font-medium text-white transition-colors ${
                 showMergeConflicts ? 'bg-danger/40 text-danger/60' : 'bg-accent hover:bg-accent-bright'
               }`}
-              title={showMergeConflicts ? t('resolveConflictsFirst') : t('pullLatestChanges')}>
-              <IconCloudArrowDown className="w-3 h-3" />{busyAction === 'pull' ? t('loading') : showMergeConflicts ? t('conflicts') : t('pull')}
+              title={showMergeConflicts ? t('gitSidebar.resolveConflictsFirst') : t('gitSidebar.pullLatestChanges')}>
+              <IconCloudArrowDown className="w-3 h-3" />{busyAction === 'pull' ? t('gitSidebar.loading') : showMergeConflicts ? t('gitSidebar.conflicts') : t('gitSidebar.pull')}
             </button>
             <button onClick={handlePushAction} disabled={busyAction !== null}
               className="focus-ring cursor-pointer flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-accent hover:bg-accent-bright disabled:opacity-50 disabled:cursor-not-allowed text-[11px] font-medium text-white transition-colors">
-              <IconArrowUpDown className="w-3 h-3" />{busyAction === 'push' ? t('loading') : t('push')}
+              <IconArrowUpDown className="w-3 h-3" />{busyAction === 'push' ? t('gitSidebar.loading') : t('gitSidebar.push')}
             </button>
             <button disabled={busyAction !== null}
               onClick={handleForcePush}
               className="focus-ring cursor-pointer flex items-center gap-1.5 px-3 py-1.5 rounded-lg border border-danger/40 text-danger hover:bg-danger/10 hover:border-danger disabled:opacity-50 disabled:cursor-not-allowed text-[11px] font-medium transition-colors">
-              <IconBomb className="w-3 h-3" />{busyAction === 'force-push' ? t('loading') : t('force')}
+              <IconBomb className="w-3 h-3" />{busyAction === 'force-push' ? t('gitSidebar.loading') : t('gitSidebar.force')}
             </button>
             <button disabled={busyAction !== null}
               onClick={() => doAction('fetch', () => api.gitFetch(project.path))}
               className="focus-ring cursor-pointer flex items-center gap-1.5 px-3 py-1.5 rounded-lg border border-line text-muted hover:text-ink hover:border-accent-dim disabled:opacity-50 disabled:cursor-not-allowed text-[11px] font-medium transition-colors">
-              <IconRefresh className={`w-3 h-3 ${busyAction === 'fetch' ? 'animate-spin' : ''}`} />{busyAction === 'fetch' ? t('loading') : t('fetch')}
+              <IconRefresh className={`w-3 h-3 ${busyAction === 'fetch' ? 'animate-spin' : ''}`} />{busyAction === 'fetch' ? t('gitSidebar.loading') : t('gitSidebar.fetch')}
             </button>
-            <button onClick={() => api.openTerminal(project.path)} title={t('openInTerminal')}
+            <button onClick={() => api.openTerminal(project.path)} title={t('gitSidebar.openInTerminal')}
               className="focus-ring cursor-pointer px-2 py-0.5 rounded-lg border border-line text-muted hover:text-ink hover:border-accent-dim transition-colors">
               <IconTerminal className="w-3 h-3" />
             </button>
@@ -660,16 +660,16 @@ export function GitSidebar({ project, gitStatus, onClose, onRefresh }: Props) {
             {/* Remote Config */}
             <div className="px-5 pt-4 pb-2 border-b border-line">
               <div className="flex items-center justify-between mb-2">
-                <h4 className="text-[10px] font-semibold uppercase tracking-wider text-muted/60">{t('remote')}</h4>
+                <h4 className="text-[10px] font-semibold uppercase tracking-wider text-muted/60">{t('gitSidebar.remote')}</h4>
                 <button onClick={() => setShowRemoteInput((v) => !v)}
                   className="focus-ring cursor-pointer text-[10px] text-accent-bright hover:underline transition-colors">
-                  {remoteUrl ? t('change') : t('add')}
+                  {remoteUrl ? t('gitSidebar.change') : t('gitSidebar.add')}
                 </button>
               </div>
               {showRemoteInput ? (
                 <div className="flex items-center gap-1.5 mb-1">
                   <input type="text" value={remoteInput} onChange={(e) => setRemoteInput(e.target.value)}
-                    placeholder={remoteUrl ? t('newRemoteUrl') : 'https://github.com/user/repo.git'}
+                    placeholder={remoteUrl ? t('gitSidebar.newRemoteUrl') : 'https://github.com/user/repo.git'}
                     onKeyDown={(e) => { if (e.key === 'Enter') handleSetRemote(); if (e.key === 'Escape') setShowRemoteInput(false) }}
                     className="flex-1 focus-ring bg-base border border-line rounded-md px-2.5 py-1.5 text-xs text-ink placeholder:text-muted transition-colors focus:border-accent-dim outline-none" autoFocus />
                   <button onClick={handleSetRemote} disabled={busyAction !== null || !remoteInput.trim()}
@@ -680,27 +680,27 @@ export function GitSidebar({ project, gitStatus, onClose, onRefresh }: Props) {
               ) : remoteUrl ? (
                 <div className="flex items-center gap-1.5">
                   <span className="flex-1 text-[11px] font-mono text-muted truncate" title={remoteUrl}>{remoteUrl}</span>
-                  <button onClick={() => setShowRemoveRemoteConfirm(true)} disabled={busyAction !== null} title={t('removeRemote')}
+                  <button onClick={() => setShowRemoveRemoteConfirm(true)} disabled={busyAction !== null} title={t('gitSidebar.removeRemote')}
                     className="focus-ring cursor-pointer p-1 rounded text-muted hover:text-danger transition-colors">
                     <IconTrash className="w-3 h-3" />
                   </button>
                 </div>
               ) : (
-                <p className="text-[11px] text-muted/60 py-1">{t('noRemoteConfigured')}</p>
+                <p className="text-[11px] text-muted/60 py-1">{t('gitSidebar.noRemoteConfigured')}</p>
               )}
             </div>
 
             {/* Branches */}
             <div className="px-5 pt-4 pb-2 border-b border-line">
               <div className="flex items-center justify-between mb-2">
-                <h4 className="text-[10px] font-semibold uppercase tracking-wider text-muted/60">{t('branches')}</h4>
+                <h4 className="text-[10px] font-semibold uppercase tracking-wider text-muted/60">{t('gitSidebar.branches')}</h4>
                 <button onClick={() => setShowCreateBranch((v) => !v)}
-                  className="focus-ring cursor-pointer text-[10px] text-accent-bright hover:underline transition-colors">{t('new')}</button>
+                  className="focus-ring cursor-pointer text-[10px] text-accent-bright hover:underline transition-colors">{t('gitSidebar.new')}</button>
               </div>
               {showCreateBranch && (
                 <div className="flex items-center gap-1.5 mb-2">
                   <input type="text" value={newBranchName} onChange={(e) => setNewBranchName(e.target.value)}
-                    placeholder={t('branchName')}
+                    placeholder={t('gitSidebar.branchName')}
                     onKeyDown={(e) => { if (e.key === 'Enter') handleCreateBranch(); if (e.key === 'Escape') setShowCreateBranch(false) }}
                     className="flex-1 focus-ring bg-base border border-line rounded-md px-2.5 py-1.5 text-xs text-ink placeholder:text-muted transition-colors focus:border-accent-dim outline-none" autoFocus />
                   <button onClick={handleCreateBranch} disabled={busyAction !== null || !newBranchName.trim()}
@@ -710,9 +710,9 @@ export function GitSidebar({ project, gitStatus, onClose, onRefresh }: Props) {
                 </div>
               )}
               {branchesLoading ? (
-                <div className="flex items-center gap-2 py-2"><IconRefresh className="w-3 h-3 animate-spin text-muted" /><span className="text-[11px] text-muted">{t('loadingBranches')}</span></div>
+                <div className="flex items-center gap-2 py-2"><IconRefresh className="w-3 h-3 animate-spin text-muted" /><span className="text-[11px] text-muted">{t('gitSidebar.loadingBranches')}</span></div>
               ) : branches.length === 0 ? (
-                <p className="text-[11px] text-muted/60 py-2">{t('noBranchesFound')}</p>
+                <p className="text-[11px] text-muted/60 py-2">{t('gitSidebar.noBranchesFound')}</p>
               ) : (
                 <div className="flex flex-col gap-0.5 max-h-[150px] overflow-y-auto">
                   {branches.map((b) => (
@@ -726,17 +726,17 @@ export function GitSidebar({ project, gitStatus, onClose, onRefresh }: Props) {
                             color: switchedTo ? 'var(--color-mint, #34d399)' : 'var(--color-accent-bright)',
                           }}
                         >
-                          {switchedTo === b.name ? t('switched') : t('active')}
+                          {switchedTo === b.name ? t('gitSidebar.switched') : t('gitSidebar.active')}
                         </span>
                       ) : (
                         <div className="flex items-center gap-0.5 opacity-0 group-hover:opacity-100 transition-opacity">
                           <button onClick={() => handleSwitchBranch(b.name)} disabled={busyAction !== null}
-                            className="focus-ring cursor-pointer p-1 rounded text-muted hover:text-accent-bright hover:bg-raised disabled:opacity-40 transition-colors" title={t('switchToBranch', { name: b.name })}>
+                            className="focus-ring cursor-pointer p-1 rounded text-muted hover:text-accent-bright hover:bg-raised disabled:opacity-40 transition-colors" title={t('gitSidebar.switchToBranch', { name: b.name })}>
                             <IconCheck className="w-3 h-3" />
                           </button>
                           {b.name !== 'main' && b.name !== 'master' && (
                             <button onClick={() => setConfirmBranchDelete(b.name)} disabled={busyAction !== null}
-                              className="focus-ring cursor-pointer p-1 rounded text-muted hover:text-danger hover:bg-raised disabled:opacity-40 transition-colors" title={t('deleteBranch', { name: b.name })}>
+                              className="focus-ring cursor-pointer p-1 rounded text-muted hover:text-danger hover:bg-raised disabled:opacity-40 transition-colors" title={t('gitSidebar.deleteBranch', { name: b.name })}>
                               <IconTrash className="w-3 h-3" />
                             </button>
                           )}
@@ -751,35 +751,35 @@ export function GitSidebar({ project, gitStatus, onClose, onRefresh }: Props) {
             {/* Changes + Staging + Commit */}
             <div className="px-5 pt-4 pb-2 border-b border-line">
               <div className="flex items-center justify-between mb-2">
-                <h4 className="text-[10px] font-semibold uppercase tracking-wider text-muted/60">{t('changes')}</h4>
+                <h4 className="text-[10px] font-semibold uppercase tracking-wider text-muted/60">{t('gitSidebar.changes')}</h4>
                 {(unstagedFiles.length > 0 || stagedFiles.size > 0) && (
                   <div className="flex items-center gap-2">
                     {/* Select / Deselect All */}
                     {stagedFiles.size < unstagedFiles.length && (
                       <button onClick={selectAllUnstaged}
-                        className="focus-ring cursor-pointer text-[10px] text-accent-bright hover:underline transition-colors">{t('selectAll')}</button>
+                        className="focus-ring cursor-pointer text-[10px] text-accent-bright hover:underline transition-colors">{t('gitSidebar.selectAll')}</button>
                     )}
                     {(stagedFiles.size > 1 || (stagedFiles.size > 0 && unstagedFiles.length === 0)) && (
                       <button onClick={deselectAll}
-                        className="focus-ring cursor-pointer text-[10px] text-muted hover:text-ink hover:underline transition-colors">{t('deselectAll')}</button>
+                        className="focus-ring cursor-pointer text-[10px] text-muted hover:text-ink hover:underline transition-colors">{t('gitSidebar.deselectAll')}</button>
                     )}
                     <span className="text-muted/30">·</span>
                     {(stagedFiles.size > 1 || (stagedFiles.size > 0 && unstagedFiles.length === 0)) && (
                       <button onClick={() => setShowDiscardConfirm(true)} disabled={busyAction !== null}
-                        className="focus-ring cursor-pointer text-[10px] text-danger hover:underline disabled:opacity-40 disabled:cursor-not-allowed transition-colors">{t('discardAll')}</button>
+                        className="focus-ring cursor-pointer text-[10px] text-danger hover:underline disabled:opacity-40 disabled:cursor-not-allowed transition-colors">{t('gitSidebar.discardAll')}</button>
                     )}
                     {stagedFiles.size > 0 && (
                       <button onClick={handleStageFiles} disabled={busyAction !== null}
-                        className="focus-ring cursor-pointer text-[10px] text-mint hover:underline disabled:opacity-40 disabled:cursor-not-allowed transition-colors">{t('stageCount', { count: stagedFiles.size })}</button>
+                        className="focus-ring cursor-pointer text-[10px] text-mint hover:underline disabled:opacity-40 disabled:cursor-not-allowed transition-colors">{t('gitSidebar.stageCount', { count: stagedFiles.size })}</button>
                     )}
                   </div>
                 )}
               </div>
 
               {changesLoading ? (
-                <div className="flex items-center gap-2 py-2"><IconRefresh className="w-3 h-3 animate-spin text-muted" /><span className="text-[11px] text-muted">{t('checkingChanges')}</span></div>
+                <div className="flex items-center gap-2 py-2"><IconRefresh className="w-3 h-3 animate-spin text-muted" /><span className="text-[11px] text-muted">{t('gitSidebar.checkingChanges')}</span></div>
               ) : changedFiles.length === 0 ? (
-                <p className="text-[11px] text-muted/60 py-2">{t('workingTreeClean')}</p>
+                <p className="text-[11px] text-muted/60 py-2">{t('gitSidebar.workingTreeClean')}</p>
               ) : (
                 <div className="flex flex-col gap-0.5 max-h-[220px] overflow-y-auto">
                   {/* Staged section badge */}
@@ -787,7 +787,7 @@ export function GitSidebar({ project, gitStatus, onClose, onRefresh }: Props) {
                     <>
                       <div className="flex items-center gap-1.5 px-1 py-1 mt-1">
                         <span className="w-1.5 h-1.5 rounded-full bg-mint shrink-0" />
-                        <span className="text-[9px] font-semibold uppercase text-mint tracking-wider">{t('stagedCount', { count: gitStagedFiles.length })}</span>
+                        <span className="text-[9px] font-semibold uppercase text-mint tracking-wider">{t('gitSidebar.stagedCount', { count: gitStagedFiles.length })}</span>
                       </div>
                       {gitStagedFiles.map((f, i) => {
                         const info = statusLabel(f.status, t)
@@ -809,7 +809,7 @@ export function GitSidebar({ project, gitStatus, onClose, onRefresh }: Props) {
                     <>
                       <div className="flex items-center gap-1.5 px-1 py-1 mt-1">
                         <span className="w-1.5 h-1.5 rounded-full bg-accent-bright shrink-0" />
-                        <span className="text-[9px] font-semibold uppercase text-accent-bright tracking-wider">{t('pendingStageCount', { count: pendingStageFiles.length })}</span>
+                        <span className="text-[9px] font-semibold uppercase text-accent-bright tracking-wider">{t('gitSidebar.pendingStageCount', { count: pendingStageFiles.length })}</span>
                       </div>
                       {pendingStageFiles.map((f, i) => {
                         const info = statusLabel(f.status, t)
@@ -833,7 +833,7 @@ export function GitSidebar({ project, gitStatus, onClose, onRefresh }: Props) {
                         <div className="flex items-center gap-1.5">
                           <span className="w-1.5 h-1.5 rounded-full bg-amber shrink-0" />
                           <span className="text-[9px] font-semibold uppercase text-amber tracking-wider">
-                            {unstagedFiles.length === changedFiles.length - gitStagedFiles.length - pendingStageFiles.length ? t('unstaged') : t('unstagedCount', { count: unstagedFiles.length })}
+                            {unstagedFiles.length === changedFiles.length - gitStagedFiles.length - pendingStageFiles.length ? t('gitSidebar.unstaged') : t('gitSidebar.unstagedCount', { count: unstagedFiles.length })}
                           </span>
                         </div>
                       </div>
@@ -861,7 +861,7 @@ export function GitSidebar({ project, gitStatus, onClose, onRefresh }: Props) {
                   <textarea
                     value={commitMessage}
                     onChange={(e) => setCommitMessage(e.target.value)}
-                    placeholder={t('commitMessagePlaceholder')}
+                    placeholder={t('gitSidebar.commitMessagePlaceholder')}
                     rows={2}
                     onKeyDown={(e) => { if (e.key === 'Enter' && (e.ctrlKey || e.metaKey) && commitMessage.trim()) handleCommit() }}
                     className="focus-ring w-full bg-base border border-line rounded-md px-3 py-2 text-xs text-ink placeholder:text-muted transition-colors focus:border-accent-dim outline-none resize-none"
@@ -869,12 +869,12 @@ export function GitSidebar({ project, gitStatus, onClose, onRefresh }: Props) {
                   <div className="flex items-center gap-3">
                     <label className="flex items-center gap-1.5 cursor-pointer select-none" onClick={() => setAmendMode((v) => !v)}>
                       <Checkbox checked={amendMode} onChange={() => setAmendMode((v) => !v)} />
-                      <span className="text-[10px] text-muted hover:text-ink transition-colors">{t('amend')}</span>
+                      <span className="text-[10px] text-muted hover:text-ink transition-colors">{t('gitSidebar.amend')}</span>
                     </label>
                     {remoteUrl && (
                       <label className="flex items-center gap-1.5 cursor-pointer select-none" onClick={() => setPushAfterCommit((v) => !v)}>
                         <Checkbox checked={pushAfterCommit} onChange={() => setPushAfterCommit((v) => !v)} />
-                        <span className="text-[10px] text-muted hover:text-ink transition-colors">{t('pushAfter')}</span>
+                        <span className="text-[10px] text-muted hover:text-ink transition-colors">{t('gitSidebar.pushAfter')}</span>
                       </label>
                     )}
                     <div className="flex-1" />
@@ -886,8 +886,8 @@ export function GitSidebar({ project, gitStatus, onClose, onRefresh }: Props) {
                     >
                       <IconCheck className="w-3 h-3" />
                       {busyAction === 'commit'
-                        ? (pushAfterCommit ? t('commPushing') : t('committing'))
-                        : (amendMode ? t('amend') : t('commit'))}
+                        ? (pushAfterCommit ? t('gitSidebar.commPushing') : t('gitSidebar.committing'))
+                        : (amendMode ? t('gitSidebar.amend') : t('gitSidebar.commit'))}
                     </button>
                   </div>
                 </div>
@@ -898,7 +898,7 @@ export function GitSidebar({ project, gitStatus, onClose, onRefresh }: Props) {
             {(undoHistory.length > 0 || redoHistory.length > 0) && (
               <div className="px-5 pt-4 pb-3 border-b border-line">
                 <div className="flex items-center justify-between mb-2">
-                  <h4 className="text-[10px] font-semibold uppercase tracking-wider text-muted/60">{t('actions')}</h4>
+                  <h4 className="text-[10px] font-semibold uppercase tracking-wider text-muted/60">{t('gitSidebar.actions')}</h4>
                 </div>
                 <div className="flex flex-col gap-0.5">
                   {redoHistory.slice(0, 3).map((entry) => (
@@ -907,7 +907,7 @@ export function GitSidebar({ project, gitStatus, onClose, onRefresh }: Props) {
                       disabled={busyAction !== null}
                       className="flex items-center gap-2 px-2.5 py-1.5 rounded-md opacity-40 hover:opacity-100 hover:bg-raised transition-all disabled:opacity-20 disabled:cursor-not-allowed w-full text-left cursor-pointer">
                       <IconHistory className="w-3 h-3 text-muted shrink-0" />
-                      <span className="text-[11px] text-muted truncate flex-1">{t('redo')} {entry.label}</span>
+                      <span className="text-[11px] text-muted truncate flex-1">{t('gitSidebar.redo')} {entry.label}</span>
                     </button>
                   ))}
                   {undoHistory.slice(0, 5).map((entry) => (
@@ -917,7 +917,7 @@ export function GitSidebar({ project, gitStatus, onClose, onRefresh }: Props) {
                       className="flex items-center gap-2 px-2.5 py-1.5 rounded-md hover:bg-raised transition-all disabled:opacity-40 disabled:cursor-not-allowed w-full text-left cursor-pointer group">
                       <IconHistory className="w-3 h-3 text-accent-bright shrink-0" />
                       <span className="text-[11px] text-muted truncate flex-1 group-hover:text-ink transition-colors">{entry.label}</span>
-                      <span className="text-[9px] text-accent-bright font-semibold uppercase shrink-0">{t('undo')}</span>
+                      <span className="text-[9px] text-accent-bright font-semibold uppercase shrink-0">{t('gitSidebar.undo')}</span>
                     </button>
                   ))}
                 </div>
@@ -927,12 +927,12 @@ export function GitSidebar({ project, gitStatus, onClose, onRefresh }: Props) {
             {/* Stashes */}
             <div className="px-5 pt-4 pb-2 border-b border-line">
               <div className="flex items-center justify-between mb-2">
-                <h4 className="text-[10px] font-semibold uppercase tracking-wider text-muted/60">{t('stashes')}</h4>
+                <h4 className="text-[10px] font-semibold uppercase tracking-wider text-muted/60">{t('gitSidebar.stashes')}</h4>
               </div>
               {stashesLoading ? (
-                <div className="flex items-center gap-2 py-2"><IconRefresh className="w-3 h-3 animate-spin text-muted" /><span className="text-[11px] text-muted">{t('loadingStashes')}</span></div>
+                <div className="flex items-center gap-2 py-2"><IconRefresh className="w-3 h-3 animate-spin text-muted" /><span className="text-[11px] text-muted">{t('gitSidebar.loadingStashes')}</span></div>
               ) : stashes.length === 0 ? (
-                <p className="text-[11px] text-muted/60 py-2">{t('noStashes')}</p>
+                <p className="text-[11px] text-muted/60 py-2">{t('gitSidebar.noStashes')}</p>
               ) : (
                 <div className="flex flex-col gap-0.5 max-h-[120px] overflow-y-auto">
                   {stashes.map((s) => (
@@ -941,9 +941,9 @@ export function GitSidebar({ project, gitStatus, onClose, onRefresh }: Props) {
                       <span className="text-[11px] font-mono text-muted truncate flex-1">{s.message}</span>
                       <div className="flex items-center gap-0.5 opacity-0 group-hover:opacity-100 transition-opacity">
                         <button onClick={() => handleStashApply(s.index)} disabled={busyAction !== null}
-                          className="focus-ring cursor-pointer p-1 rounded text-muted hover:text-accent-bright transition-colors" title={t('applyStash')}><IconCheck className="w-3 h-3" /></button>
+                          className="focus-ring cursor-pointer p-1 rounded text-muted hover:text-accent-bright transition-colors" title={t('gitSidebar.applyStash')}><IconCheck className="w-3 h-3" /></button>
                         <button onClick={() => handleStashDrop(s.index)} disabled={busyAction !== null}
-                          className="focus-ring cursor-pointer p-1 rounded text-muted hover:text-danger transition-colors" title={t('dropStash')}><IconTrash className="w-3 h-3" /></button>
+                          className="focus-ring cursor-pointer p-1 rounded text-muted hover:text-danger transition-colors" title={t('gitSidebar.dropStash')}><IconTrash className="w-3 h-3" /></button>
                       </div>
                     </div>
                   ))}
@@ -953,11 +953,11 @@ export function GitSidebar({ project, gitStatus, onClose, onRefresh }: Props) {
 
             {/* Commits */}
             <div className="px-5 pt-4 pb-5">
-              <h4 className="text-[10px] font-semibold uppercase tracking-wider text-muted/60 mb-3">{t('recentCommits')}</h4>
+              <h4 className="text-[10px] font-semibold uppercase tracking-wider text-muted/60 mb-3">{t('gitSidebar.recentCommits')}</h4>
               {logLoading ? (
                 <div className="flex items-center justify-center py-6"><IconRefresh className="w-4 h-4 animate-spin text-muted" /></div>
               ) : logEntries.length === 0 ? (
-                <div className="border border-dashed border-line rounded-xl py-6 text-center"><p className="text-xs text-muted">{t('noCommitsFound')}</p></div>
+                <div className="border border-dashed border-line rounded-xl py-6 text-center"><p className="text-xs text-muted">{t('gitSidebar.noCommitsFound')}</p></div>
               ) : (
                 <div className="flex flex-col gap-1.5">
                   {logEntries.map((entry, i) => (
@@ -1035,9 +1035,9 @@ export function GitSidebar({ project, gitStatus, onClose, onRefresh }: Props) {
       <AnimatePresence>
         {showDiscardConfirm && (
           <ConfirmDialog
-            title={t('discardAllChanges')}
-            description={t('discardAllChangesDesc')}
-            confirmLabel={t('discard')}
+            title={t('gitSidebar.discardAllChanges')}
+            description={t('gitSidebar.discardAllChangesDesc')}
+            confirmLabel={t('gitSidebar.discard')}
             variant="danger"
             onConfirm={() => { setShowDiscardConfirm(false); handleDiscardChanges() }}
             onCancel={() => setShowDiscardConfirm(false)}
@@ -1049,9 +1049,9 @@ export function GitSidebar({ project, gitStatus, onClose, onRefresh }: Props) {
       <AnimatePresence>
         {confirmBranchDelete && (
           <ConfirmDialog
-            title={t('deleteBranchConfirm', { name: confirmBranchDelete })}
-            description={t('deleteBranchDesc')}
-            confirmLabel={t('delete')}
+            title={t('gitSidebar.deleteBranchConfirm', { name: confirmBranchDelete })}
+            description={t('gitSidebar.deleteBranchDesc')}
+            confirmLabel={t('gitSidebar.delete')}
             variant="danger"
             onConfirm={() => { const name = confirmBranchDelete; setConfirmBranchDelete(null); handleDeleteBranch(name) }}
             onCancel={() => setConfirmBranchDelete(null)}
@@ -1063,9 +1063,9 @@ export function GitSidebar({ project, gitStatus, onClose, onRefresh }: Props) {
       <AnimatePresence>
         {showRemoveRemoteConfirm && (
           <ConfirmDialog
-            title={t('removeRemoteConfirm')}
-            description={t('removeRemoteDesc')}
-            confirmLabel={t('remove')}
+            title={t('gitSidebar.removeRemoteConfirm')}
+            description={t('gitSidebar.removeRemoteDesc')}
+            confirmLabel={t('gitSidebar.remove')}
             variant="danger"
             onConfirm={() => { setShowRemoveRemoteConfirm(false); handleRemoveRemote() }}
             onCancel={() => setShowRemoveRemoteConfirm(false)}
@@ -1077,9 +1077,9 @@ export function GitSidebar({ project, gitStatus, onClose, onRefresh }: Props) {
       <AnimatePresence>
         {showStashPushConfirm && (
           <ConfirmDialog
-            title={t('stashAllChanges')}
-            description={t('stashAllChangesDesc')}
-            confirmLabel={t('stash')}
+            title={t('gitSidebar.stashAllChanges')}
+            description={t('gitSidebar.stashAllChangesDesc')}
+            confirmLabel={t('gitSidebar.stash')}
             onConfirm={() => { setShowStashPushConfirm(false); handleStashPush() }}
             onCancel={() => setShowStashPushConfirm(false)}
           />
@@ -1090,9 +1090,9 @@ export function GitSidebar({ project, gitStatus, onClose, onRefresh }: Props) {
       <AnimatePresence>
         {showPushConfirm && (
           <ConfirmDialog
-            title={t('pushWithUncommitted')}
-            description={t('pushWithUncommittedDesc')}
-            confirmLabel={t('pushAnyway')}
+            title={t('gitSidebar.pushWithUncommitted')}
+            description={t('gitSidebar.pushWithUncommittedDesc')}
+            confirmLabel={t('gitSidebar.pushAnyway')}
             variant="default"
             onConfirm={() => { setShowPushConfirm(false); executePush(false) }}
             onCancel={() => setShowPushConfirm(false)}
@@ -1104,9 +1104,9 @@ export function GitSidebar({ project, gitStatus, onClose, onRefresh }: Props) {
       <AnimatePresence>
         {showForcePushConfirm && (
           <ConfirmDialog
-            title={t('forcePushConfirm')}
-            description={t('forcePushDesc')}
-            confirmLabel={t('forcePush')}
+            title={t('gitSidebar.forcePushConfirm')}
+            description={t('gitSidebar.forcePushDesc')}
+            confirmLabel={t('gitSidebar.forcePush')}
             variant="danger"
             onConfirm={() => { setShowForcePushConfirm(false); executePush(true) }}
             onCancel={() => setShowForcePushConfirm(false)}

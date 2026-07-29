@@ -115,7 +115,7 @@ export function GitResultDialog({
               <IconChevronDown
                 className={`w-3 h-3 transition-transform duration-150 ${showRaw ? 'rotate-0' : '-rotate-90'}`}
               />
-              <span>{t('technicalDetails')}</span>
+              <span>{t('gitResultDialog.technicalDetails')}</span>
               <div className="flex-1" />
               {showRaw && (
                 <button
@@ -124,7 +124,7 @@ export function GitResultDialog({
                     navigator.clipboard.writeText(rawError)
                   }}
                   className="focus-ring p-1 rounded text-muted hover:text-ink hover:bg-raised transition-colors cursor-pointer"
-                  title={t('copyToClipboard')}
+                  title={t('gitResultDialog.copyToClipboard')}
                 >
                   <IconCopy className="w-3 h-3" />
                 </button>
@@ -149,7 +149,7 @@ export function GitResultDialog({
               className="focus-ring cursor-pointer flex items-center gap-1.5 px-3.5 py-2 rounded-lg text-xs text-muted hover:text-ink hover:bg-raised border border-line transition-colors"
             >
               <IconTerminal className="w-3.5 h-3.5" />
-              {t('openTerminal')}
+              {t('gitResultDialog.openTerminal')}
             </button>
           )}
           <button
@@ -160,7 +160,7 @@ export function GitResultDialog({
                 : 'bg-accent hover:bg-accent-bright text-white'
             }`}
           >
-            {type === 'success' ? t('done') : t('gotIt')}
+            {type === 'success' ? t('gitResultDialog.done') : t('gitResultDialog.gotIt')}
           </button>
         </div>
       </motion.div>

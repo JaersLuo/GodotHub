@@ -118,13 +118,13 @@ type StepId =
   'welcome' | 'projects' | 'versions' | 'templates' | 'categories' | 'customize' | 'finish'
 
 const ALL_STEPS: { id: StepId; labelKey: string }[] = [
-  { id: 'welcome', labelKey: 'steps.welcome' },
-  { id: 'projects', labelKey: 'steps.projects' },
-  { id: 'versions', labelKey: 'steps.versions' },
-  { id: 'templates', labelKey: 'steps.templates' },
-  { id: 'categories', labelKey: 'steps.categories' },
-  { id: 'customize', labelKey: 'steps.customize' },
-  { id: 'finish', labelKey: 'steps.finish' },
+  { id: 'welcome', labelKey: 'onboarding.steps.welcome' },
+  { id: 'projects', labelKey: 'onboarding.steps.projects' },
+  { id: 'versions', labelKey: 'onboarding.steps.versions' },
+  { id: 'templates', labelKey: 'onboarding.steps.templates' },
+  { id: 'categories', labelKey: 'onboarding.steps.categories' },
+  { id: 'customize', labelKey: 'onboarding.steps.customize' },
+  { id: 'finish', labelKey: 'onboarding.steps.finish' },
 ]
 
 function StepShell({
@@ -264,8 +264,8 @@ export function OnboardingView({ settings, onComplete }: Props) {
             {step.id === 'welcome' && (
               <StepShell
                 icon={<span className="font-black italic text-lg">GH</span>}
-                title={t('welcome.title')}
-                description={t('welcome.description')}
+                title={t('onboarding.welcome.title')}
+                description={t('onboarding.welcome.description')}
               >
                 <div className="flex flex-col gap-4">
                   <div className="flex items-center gap-3">
@@ -277,23 +277,23 @@ export function OnboardingView({ settings, onComplete }: Props) {
                   <div className="grid grid-cols-3 gap-3">
                   <div className="flex flex-col gap-2 p-4 rounded-xl border border-line bg-surface/60">
                     <IconLayoutGrid className="w-4 h-4 text-accent-bright" />
-                    <span className="text-xs font-medium">{t('welcome.projects')}</span>
+                    <span className="text-xs font-medium">{t('onboarding.welcome.projects')}</span>
                     <p className="text-[11px] text-muted leading-relaxed">
-                      {t('welcome.projectsDesc')}
+                      {t('onboarding.welcome.projectsDesc')}
                     </p>
                   </div>
                   <div className="flex flex-col gap-2 p-4 rounded-xl border border-line bg-surface/60">
                     <IconLayoutList className="w-4 h-4 text-accent-bright" />
-                    <span className="text-xs font-medium">{t('welcome.versions')}</span>
+                    <span className="text-xs font-medium">{t('onboarding.welcome.versions')}</span>
                     <p className="text-[11px] text-muted leading-relaxed">
-                      {t('welcome.versionsDesc')}
+                      {t('onboarding.welcome.versionsDesc')}
                     </p>
                   </div>
                   <div className="flex flex-col gap-2 p-4 rounded-xl border border-line bg-surface/60">
                     <IconNews className="w-4 h-4 text-accent-bright" />
-                    <span className="text-xs font-medium">{t('welcome.news')}</span>
+                    <span className="text-xs font-medium">{t('onboarding.welcome.news')}</span>
                     <p className="text-[11px] text-muted leading-relaxed">
-                      {t('welcome.newsDesc')}
+                      {t('onboarding.welcome.newsDesc')}
                     </p>
                   </div>
                 </div>
@@ -304,18 +304,18 @@ export function OnboardingView({ settings, onComplete }: Props) {
             {step.id === 'projects' && (
               <StepShell
                 icon={<IconFolderPlus className="w-5 h-5" />}
-                title={t('projects.title')}
-                description={t('projects.description')}
+                title={t('onboarding.projects.title')}
+                description={t('onboarding.projects.description')}
               >
                 <DirList
                   dirs={draft.project_scan_dirs}
                   onChange={(dirs) => setField('project_scan_dirs', dirs)}
-                  emptyHint={t('projects.emptyHint')}
+                  emptyHint={t('onboarding.projects.emptyHint')}
                   defaultDir={draft.default_project_location}
                   onSetDefault={(dir) =>
                     setField('default_project_location', dir)
                   }
-                  defaultLabel={t('projects.defaultLabel')}
+                  defaultLabel={t('onboarding.projects.defaultLabel')}
                 />
               </StepShell>
             )}
@@ -323,16 +323,16 @@ export function OnboardingView({ settings, onComplete }: Props) {
             {step.id === 'versions' && (
               <StepShell
                 icon={<IconDownload className="w-5 h-5" />}
-                title={t('versions.title')}
-                description={t('versions.description')}
+                title={t('onboarding.versions.title')}
+                description={t('onboarding.versions.description')}
               >
                 <DirList
                   dirs={draft.version_scan_dirs}
                   onChange={(dirs) => setField('version_scan_dirs', dirs)}
-                  emptyHint={t('versions.emptyHint')}
+                  emptyHint={t('onboarding.versions.emptyHint')}
                   defaultDir={draft.download_dir}
                   onSetDefault={(dir) => setField('download_dir', dir)}
-                  defaultLabel={t('versions.defaultLabel')}
+                  defaultLabel={t('onboarding.versions.defaultLabel')}
                 />
               </StepShell>
             )}
@@ -340,8 +340,8 @@ export function OnboardingView({ settings, onComplete }: Props) {
             {step.id === 'templates' && (
               <StepShell
                 icon={<IconCopy className="w-5 h-5" />}
-                title={t('templates.title')}
-                description={t('templates.description')}
+                title={t('onboarding.templates.title')}
+                description={t('onboarding.templates.description')}
               >
                 <div className="flex flex-col gap-3 w-full">
                   <div className="flex items-center gap-2.5">
@@ -353,7 +353,7 @@ export function OnboardingView({ settings, onComplete }: Props) {
                       />
                     ) : (
                       <span className="text-xs text-muted">
-                        {t('templates.noFolderHint')}
+                        {t('onboarding.templates.noFolderHint')}
                       </span>
                     )}
                     <motion.button
@@ -365,7 +365,7 @@ export function OnboardingView({ settings, onComplete }: Props) {
                       }}
                       className="focus-ring cursor-pointer px-4 py-2.5 rounded-lg border border-line hover:border-accent-dim hover:bg-raised text-sm transition-colors"
                     >
-                      {t('templates.browse')}
+                      {t('onboarding.templates.browse')}
                     </motion.button>
                     {draft.template_scan_dir && (
                       <motion.button
@@ -374,7 +374,7 @@ export function OnboardingView({ settings, onComplete }: Props) {
                         onClick={() => setField('template_scan_dir', null)}
                         className="focus-ring cursor-pointer px-3 py-2.5 rounded-lg border border-line text-xs text-muted hover:text-danger hover:border-danger/30 hover:bg-danger/10 transition-colors"
                       >
-                        {t('templates.clear')}
+                        {t('onboarding.templates.clear')}
                       </motion.button>
                     )}
                   </div>
@@ -385,8 +385,8 @@ export function OnboardingView({ settings, onComplete }: Props) {
             {step.id === 'categories' && (
               <StepShell
                 icon={<IconTags className="w-5 h-5" />}
-                title={t('categories.title')}
-                description={t('categories.description')}
+                title={t('onboarding.categories.title')}
+                description={t('onboarding.categories.description')}
               >
                 <div className="flex flex-col gap-4 w-full">
                   <div className="flex flex-wrap gap-2">
@@ -426,7 +426,7 @@ export function OnboardingView({ settings, onComplete }: Props) {
                       onKeyDown={(e) =>
                         e.key === 'Enter' && addCustomCategory()
                       }
-                      placeholder={t('categories.customPlaceholder')}
+                      placeholder={t('onboarding.categories.customPlaceholder')}
                       className="focus-ring flex-1 bg-raised border border-line rounded-lg px-3.5 py-2.5 text-sm focus:border-accent-dim transition-colors"
                     />
                     <motion.button
@@ -437,14 +437,14 @@ export function OnboardingView({ settings, onComplete }: Props) {
                       className="focus-ring cursor-pointer shrink-0 flex items-center gap-1.5 px-4 py-2.5 rounded-lg bg-accent hover:bg-accent-bright disabled:opacity-50 disabled:cursor-not-allowed text-sm font-medium text-white transition-colors"
                     >
                       <IconPlus className="w-3.5 h-3.5" />
-                      {t('categories.add')}
+                      {t('onboarding.categories.add')}
                     </motion.button>
                   </div>
 
                   {categories.length > 0 && (
                     <div className="flex flex-col gap-2">
                       <span className="text-[11px] font-medium text-muted uppercase tracking-wide">
-                        {t('categories.yourCategories')}
+                        {t('onboarding.categories.yourCategories')}
                       </span>
                       <div className="flex flex-col gap-1.5 max-h-40 overflow-y-auto">
                         {categories.map((c) => (
@@ -455,7 +455,7 @@ export function OnboardingView({ settings, onComplete }: Props) {
                             <span className="text-xs">{c.name}</span>
                             <button
                               onClick={() => removeCategory(c.id)}
-                              aria-label={t('categories.removeAria', { name: c.name })}
+                              aria-label={t('onboarding.categories.removeAria', { name: c.name })}
                               className="icon-wiggle cursor-pointer text-muted opacity-0 group-hover:opacity-100 hover:text-danger transition-colors"
                             >
                               <IconTrash className="w-3.5 h-3.5" />
@@ -467,7 +467,7 @@ export function OnboardingView({ settings, onComplete }: Props) {
                   )}
 
                   <p className="text-[11px] text-muted leading-relaxed">
-                    {t('categories.optionalNote')}
+                    {t('onboarding.categories.optionalNote')}
                   </p>
                 </div>
               </StepShell>
@@ -476,13 +476,13 @@ export function OnboardingView({ settings, onComplete }: Props) {
             {step.id === 'customize' && (
               <StepShell
                 icon={<IconArrowUpDown className="w-5 h-5" />}
-                title={t('customize.title')}
-                description={t('customize.description')}
+                title={t('onboarding.customize.title')}
+                description={t('onboarding.customize.description')}
               >
                 <div className="flex flex-col gap-7 w-full">
                   <div className="flex gap-8">
                     <ColorSwatchPicker
-                      label={t('customize.accentColor')}
+                      label={t('onboarding.customize.accentColor')}
                       value={draft.accent_color}
                       presets={
                       draft.theme_mode === 'light'
@@ -499,7 +499,7 @@ export function OnboardingView({ settings, onComplete }: Props) {
                       }}
                     />
                     <ColorSwatchPicker
-                      label={t('customize.backgroundColor')}
+                      label={t('onboarding.customize.backgroundColor')}
                       value={draft.background_color}
                       presets={
                       draft.theme_mode === 'light'
@@ -520,7 +520,7 @@ export function OnboardingView({ settings, onComplete }: Props) {
                   <label className="flex flex-col gap-2.5">
                     <div className="flex items-center justify-between">
                       <span className="text-xs font-medium text-muted">
-                        {t('customize.cornerRadius')}
+                        {t('onboarding.customize.cornerRadius')}
                       </span>
                       <span className="text-xs font-mono text-ink bg-raised px-2 py-0.5 rounded-md">
                         {draft.corner_radius}px
@@ -531,7 +531,7 @@ export function OnboardingView({ settings, onComplete }: Props) {
                       max={20}
                       step={1}
                       value={draft.corner_radius}
-                      label={t('customize.cornerRadius')}
+                      label={t('onboarding.customize.cornerRadius')}
                       onChange={(v) => {
                         setField('corner_radius', v)
                         applyRadius(v)
@@ -545,27 +545,27 @@ export function OnboardingView({ settings, onComplete }: Props) {
             {step.id === 'finish' && (
               <StepShell
                 icon={<IconCheck className="w-5 h-5" />}
-                title={t('finish.title')}
-                description={t('finish.description')}
+                title={t('onboarding.finish.title')}
+                description={t('onboarding.finish.description')}
               >
                 <div className="flex flex-col gap-2.5 w-full text-sm">
                   <div className="flex items-center justify-between px-4 py-3 rounded-lg bg-surface/60 border border-line">
-                    <span className="text-muted">{t('finish.projectFolders')}</span>
+                    <span className="text-muted">{t('onboarding.finish.projectFolders')}</span>
                     <span className="font-mono text-xs">
-                      {draft.project_scan_dirs.length || t('finish.none')}
+                      {draft.project_scan_dirs.length || t('onboarding.finish.none')}
                     </span>
                   </div>
                   <div className="flex items-center justify-between px-4 py-3 rounded-lg bg-surface/60 border border-line">
-                    <span className="text-muted">{t('finish.versionFolders')}</span>
+                    <span className="text-muted">{t('onboarding.finish.versionFolders')}</span>
                     <span className="font-mono text-xs">
-                      {draft.version_scan_dirs.length || t('finish.none')}
+                      {draft.version_scan_dirs.length || t('onboarding.finish.none')}
                     </span>
                   </div>
                   {settings.categories_enabled && (
                     <div className="flex items-center justify-between px-4 py-3 rounded-lg bg-surface/60 border border-line">
-                      <span className="text-muted">{t('finish.categories')}</span>
+                      <span className="text-muted">{t('onboarding.finish.categories')}</span>
                       <span className="font-mono text-xs">
-                        {categories.length || t('finish.none')}
+                        {categories.length || t('onboarding.finish.none')}
                       </span>
                     </div>
                   )}
@@ -581,7 +581,7 @@ export function OnboardingView({ settings, onComplete }: Props) {
             disabled={finishing}
             className="focus-ring cursor-pointer px-4 py-2.5 rounded-lg text-sm text-muted hover:text-ink hover:bg-raised transition-colors disabled:opacity-50"
           >
-            {stepIndex === 0 ? t('nav.skipSetup') : t('nav.back')}
+            {stepIndex === 0 ? t('onboarding.nav.skipSetup') : t('onboarding.nav.back')}
           </button>
 
           {step.id === 'finish' ? (
@@ -592,7 +592,7 @@ export function OnboardingView({ settings, onComplete }: Props) {
               disabled={finishing}
               className="focus-ring cursor-pointer px-6 py-2.5 rounded-lg bg-accent hover:bg-accent-bright disabled:opacity-60 text-sm font-medium text-white transition-colors"
             >
-              {finishing ? t('nav.finishing') : t('nav.getStarted')}
+              {finishing ? t('onboarding.nav.finishing') : t('onboarding.nav.getStarted')}
             </motion.button>
           ) : (
             <motion.button
@@ -601,7 +601,7 @@ export function OnboardingView({ settings, onComplete }: Props) {
               onClick={goNext}
               className="focus-ring cursor-pointer px-6 py-2.5 rounded-lg bg-accent hover:bg-accent-bright text-sm font-medium text-white transition-colors"
             >
-              {t('nav.continue')}
+              {t('onboarding.nav.continue')}
             </motion.button>
           )}
         </div>

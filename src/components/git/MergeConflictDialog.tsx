@@ -131,10 +131,10 @@ export function MergeConflictDialog({
             </div>
             <div className="flex-1 min-w-0">
               <h3 className="font-display font-semibold text-ink text-lg">
-                {t('mergeConflicts')}
+                {t('mergeConflictDialog.mergeConflicts')}
               </h3>
               <p className="text-sm text-muted mt-1">
-                {t('description')}
+                {t('mergeConflictDialog.description')}
               </p>
             </div>
             <button
@@ -150,12 +150,12 @@ export function MergeConflictDialog({
             <div className="px-6 pt-4 pb-2">
               <div className="flex items-center justify-between mb-2">
                 <span className="text-xs text-muted">
-                  {t('resolvedCount', { resolved: resolvedCount, total: conflictFiles.length })}
+                  {t('mergeConflictDialog.resolvedCount', { resolved: resolvedCount, total: conflictFiles.length })}
                 </span>
                 {allResolved && (
                   <span className="text-xs text-mint font-medium flex items-center gap-1">
                     <IconCheckCircle className="w-3.5 h-3.5" />
-                    {t('allResolved')}
+                    {t('mergeConflictDialog.allResolved')}
                   </span>
                 )}
               </div>
@@ -178,7 +178,7 @@ export function MergeConflictDialog({
               <div className="flex items-center justify-center py-12">
                 <IconRefresh className="w-5 h-5 animate-spin text-muted" />
                 <span className="ml-2.5 text-sm text-muted">
-                  {t('checkingConflicts')}
+                  {t('mergeConflictDialog.checkingConflicts')}
                 </span>
               </div>
             ) : error ? (
@@ -192,13 +192,13 @@ export function MergeConflictDialog({
                   className="focus-ring cursor-pointer flex items-center gap-1.5 px-3.5 py-2 rounded-lg bg-accent hover:bg-accent-bright text-xs font-medium text-white transition-colors"
                 >
                   <IconRefresh className="w-3 h-3" />
-                  {t('retry')}
+                  {t('mergeConflictDialog.retry')}
                 </button>
               </div>
             ) : conflictFiles.length === 0 ? (
               <div className="flex flex-col items-center justify-center py-8 gap-2">
                 <IconCheckCircle className="w-8 h-8 text-mint/60" />
-                <p className="text-sm text-muted">{t('noConflictsFound')}</p>
+                <p className="text-sm text-muted">{t('mergeConflictDialog.noConflictsFound')}</p>
               </div>
             ) : (
               <div className="flex flex-col gap-2">
@@ -234,8 +234,8 @@ export function MergeConflictDialog({
                         </p>
                         <p className="text-[10px] text-muted mt-0.5">
                           {file.resolved
-                            ? t('resolved', { strategy: file.resolved })
-                            : t('needsResolution')}
+                            ? t('mergeConflictDialog.resolved', { strategy: file.resolved })
+                            : t('mergeConflictDialog.needsResolution')}
                         </p>
                       </div>
 
@@ -246,9 +246,9 @@ export function MergeConflictDialog({
                             onClick={() => handleResolve(file.path, 'ours')}
                             disabled={resolving === file.path}
                             className="focus-ring cursor-pointer px-2 py-1.5 rounded-lg bg-accent/10 hover:bg-accent/20 border border-accent/20 text-accent-bright disabled:opacity-40 disabled:cursor-not-allowed text-[10px] font-medium transition-colors"
-                            title={t('keepLocal')}
+                            title={t('mergeConflictDialog.keepLocal')}
                           >
-                            {t('useOurs')}
+                            {t('mergeConflictDialog.useOurs')}
                           </button>
                           <button
                             onClick={() =>
@@ -256,14 +256,14 @@ export function MergeConflictDialog({
                             }
                             disabled={resolving === file.path}
                             className="focus-ring cursor-pointer px-2 py-1.5 rounded-lg bg-mint/10 hover:bg-mint/20 border border-mint/20 text-mint disabled:opacity-40 disabled:cursor-not-allowed text-[10px] font-medium transition-colors"
-                            title={t('acceptIncoming')}
+                            title={t('mergeConflictDialog.acceptIncoming')}
                           >
-                            {t('useTheirs')}
+                            {t('mergeConflictDialog.useTheirs')}
                           </button>
                           <button
                             onClick={() => onOpenTerminal()}
                             className="focus-ring cursor-pointer p-1.5 rounded-lg border border-line text-muted hover:text-ink hover:bg-raised transition-colors shrink-0"
-                            title={t('editManually')}
+                            title={t('mergeConflictDialog.editManually')}
                           >
                             <IconTerminal className="w-3.5 h-3.5" />
                           </button>
@@ -271,9 +271,9 @@ export function MergeConflictDialog({
                             onClick={() => handleMarkManual(file.path)}
                             disabled={resolving === file.path}
                             className="focus-ring cursor-pointer px-2 py-1.5 rounded-lg bg-base hover:bg-raised border border-line text-muted hover:text-ink disabled:opacity-40 disabled:cursor-not-allowed text-[10px] font-medium transition-colors"
-                            title={t('markFixedDesc')}
+                            title={t('mergeConflictDialog.markFixedDesc')}
                           >
-                            {t('markFixed')}
+                            {t('mergeConflictDialog.markFixed')}
                           </button>
                         </div>
                       )}
@@ -291,7 +291,7 @@ export function MergeConflictDialog({
                           }
                           className="focus-ring cursor-pointer text-[10px] text-muted hover:text-ink underline transition-colors shrink-0"
                         >
-                          {t('undo')}
+                          {t('mergeConflictDialog.undo')}
                         </button>
                       )}
                     </div>
@@ -309,7 +309,7 @@ export function MergeConflictDialog({
                 className="focus-ring cursor-pointer flex items-center gap-1.5 px-3.5 py-2 rounded-lg border border-danger/40 text-danger hover:bg-danger/10 text-xs transition-colors"
               >
                 <IconCircleX className="w-3.5 h-3.5" />
-                {t('abortMerge')}
+                {t('mergeConflictDialog.abortMerge')}
               </button>
               <button
                 onClick={() => {
@@ -319,7 +319,7 @@ export function MergeConflictDialog({
                 className="focus-ring cursor-pointer flex items-center gap-1.5 px-3.5 py-2 rounded-lg border border-line text-muted hover:text-ink hover:bg-raised text-xs transition-colors"
               >
                 <IconCode className="w-3.5 h-3.5" />
-                {t('terminal')}
+                {t('mergeConflictDialog.terminal')}
               </button>
             </div>
 
@@ -328,7 +328,7 @@ export function MergeConflictDialog({
                 onClick={onClose}
                 className="focus-ring cursor-pointer px-4 py-2 rounded-lg border border-line text-muted hover:text-ink hover:bg-raised text-xs transition-colors"
               >
-                {t('close')}
+                {t('mergeConflictDialog.close')}
               </button>
               {allResolved && (
                 <button
@@ -339,7 +339,7 @@ export function MergeConflictDialog({
                   className="focus-ring cursor-pointer flex items-center gap-1.5 px-4 py-2 rounded-lg bg-mint hover:bg-mint-bright text-white text-xs font-medium transition-colors"
                 >
                   <IconCheck className="w-3.5 h-3.5" />
-                  {t('finishMerge')}
+                  {t('mergeConflictDialog.finishMerge')}
                 </button>
               )}
             </div>
@@ -351,9 +351,9 @@ export function MergeConflictDialog({
       <AnimatePresence>
         {showAbortConfirm && (
           <ConfirmDialog
-            title={t('abortMergeTitle')}
-            description={t('abortMergeDesc')}
-            confirmLabel={t('abortMerge')}
+            title={t('mergeConflictDialog.abortMergeTitle')}
+            description={t('mergeConflictDialog.abortMergeDesc')}
+            confirmLabel={t('mergeConflictDialog.abortMerge')}
             variant="danger"
             onConfirm={() => {
               setShowAbortConfirm(false)

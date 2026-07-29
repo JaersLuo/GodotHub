@@ -345,6 +345,15 @@
       "finishing": "完成中…",
       "getStarted": "开始使用"
     },
+    "steps": {
+      "welcome": "欢迎",
+      "projects": "项目",
+      "versions": "Godot 版本",
+      "templates": "模板",
+      "categories": "分类",
+      "customize": "个性化",
+      "finish": "完成"
+    },
     "welcome": {
       "title": "欢迎使用 GodotHub",
       "description": "为这台机器上的每个 Godot 项目和引擎版本提供一个家。让我们设置一些东西,让它按你想要的方式工作,只需要一分钟,这里的所有内容都可以在设置中稍后更改。",
@@ -892,7 +901,12 @@
     "renamed": "已重命名",
     "copied": "已复制",
     "untracked": "未跟踪",
-    "unmerged": "未合并"
+    "unmerged": "未合并",
+    "error": "错误",
+    "success": "成功",
+    "info": "提示",
+    "changesCommittedSuccessfully": "更改已成功提交",
+    "commitMessage": "提交: {{msg}}"
   },
   "gitResultDialog": {
     "technicalDetails": "技术细节",

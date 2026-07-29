@@ -901,7 +901,12 @@
     "renamed": "Renamed",
     "copied": "Copied",
     "untracked": "Untracked",
-    "unmerged": "Unmerged"
+    "unmerged": "Unmerged",
+    "error": "Error",
+    "success": "Success",
+    "info": "Info",
+    "changesCommittedSuccessfully": "Changes committed successfully",
+    "commitMessage": "Commit: {{msg}}"
   },
   "gitResultDialog": {
     "technicalDetails": "Technical details",
